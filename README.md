@@ -22,6 +22,11 @@ WASD walks and strafes, the mouse turns, left click and Ctrl fire, Space uses, S
 automap, 1 to 7 pick weapons and backquote (`) opens DOOM's menu. Pads are supported too; the full mapping
 is in `addons/pure_doom/README.md`.
 
+DOOM turns on relative mouse motion, so the demo captures the cursor as it boots. Escape hands it back and
+clicking in the window takes it again. On a web export the browser only grants pointer lock from inside a
+user gesture, so the demo starts behind a "Click to start" screen and captures on that click; the
+interstitial does not appear anywhere else.
+
 ## Installing into your own project
 
 Copy `addons/pure_doom/` into your project's `addons/` folder. Nothing needs enabling in Project Settings:

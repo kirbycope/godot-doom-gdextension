@@ -16,6 +16,12 @@ in, and it is also the shortest example of wiring the node up: instantiate it, c
 `midi_message` to a synthesiser, call `start()`. Where the library is not built for the platform the demo
 shows a message instead of failing.
 
+It also shows the two things a host scene has to handle itself. DOOM turns on relative mouse motion, so the
+demo captures the cursor in `_ready()`, gives it back on Escape and takes it again on a click. And because a
+browser only grants pointer lock from inside a user gesture, a web export cannot capture at startup at all;
+the demo puts a "Click to start" `CanvasLayer` up when `OS.has_feature("web")` and captures on that first
+click. Off the web the interstitial stays hidden.
+
 ## Using the node
 
 Add a `PureDoom` node (it is a `TextureRect`) anywhere a `Control` can go, typically inside a `SubViewport`

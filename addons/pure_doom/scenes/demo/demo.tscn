@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://addons/pure_doom/scenes/demo/demo.gd" id="1_demo"]
 [ext_resource type="PackedScene" path="res://addons/pure_doom/scenes/pure_doom_controls_overlay.tscn" id="2_overlay"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_start"]
+font_size = 24
 
 [node name="Demo" type="Control"]
 texture_filter = 1
@@ -48,3 +51,26 @@ vertical_alignment = 1
 
 [node name="PureDoomControlsOverlay" parent="." instance=ExtResource("2_overlay")]
 
+[node name="ClickToStart" type="CanvasLayer" parent="."]
+layer = 100
+visible = false
+
+[node name="ColorRect" type="ColorRect" parent="ClickToStart"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="ClickToStart/ColorRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Click to start"
+label_settings = SubResource("LabelSettings_start")
+horizontal_alignment = 1
+vertical_alignment = 1
