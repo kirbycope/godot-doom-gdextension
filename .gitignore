@@ -4,19 +4,7 @@
 .DS_Store
 test-results/
 .mcp/
-
-# GDExtension build output (the prebuilt libraries in addons/pure_doom/bin are committed)
-addons/pure_doom/godot-cpp/
-addons/pure_doom/bin/~*.TMP
-addons/pure_doom/bin/*.exp
-addons/pure_doom/bin/*.lib
-addons/pure_doom/bin/*.pdb
-addons/pure_doom/bin/*.ilk
-*.obj
-*.os
-*.o
-*.pdb
-.sconsign.dblite
-compile_commands.json
 extension_api.json
-__pycache__/
+
+# The GDExtension's own build output is ignored by addons/pure_doom/.gitignore, which
+# travels with the addon so it works the same wherever the addon is dropped.
