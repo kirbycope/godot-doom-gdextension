@@ -14,7 +14,7 @@ config/name="Godot Doom GDExtension"
 config/version="1.0.0"
 run/main_scene="res://addons/godot_doom_gdextension/scenes/demo/demo.tscn"
 config/features=PackedStringArray("4.8", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://co754yg10p7xi"
 
 [display]
 

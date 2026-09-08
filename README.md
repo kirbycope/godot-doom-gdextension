@@ -1,3 +1,5 @@
+![Preview](./godot-doom-gdextension.png)
+
 # Godot Doom GDExtension
 
 The real DOOM engine running inside Godot 4.8 as a GDExtension node. This repository is the Godot project
