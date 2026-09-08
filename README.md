@@ -1,4 +1,4 @@
-![Preview](./godot-doom-gdextension.png)
+![Preview](./addons/godot_doom_gdextension/assets/godot-doom-gdextension.png)
 
 # Godot Doom GDExtension
 
