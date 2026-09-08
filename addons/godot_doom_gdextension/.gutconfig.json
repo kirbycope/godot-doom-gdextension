@@ -1,6 +1,6 @@
 {
   "dirs": [
-    "res://addons/pure_doom/tests"
+    "res://addons/godot_doom_gdextension/tests"
   ],
   "include_subdirs": false,
   "prefix": "test_",

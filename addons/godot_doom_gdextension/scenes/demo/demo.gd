@@ -5,7 +5,10 @@ extends Control
 ## the platform the screen says so instead.
 
 const MIDI_PLAYER_SCENE: String = "res://addons/midi/MidiPlayer.tscn" ## Optional: no music without it.
-const SOUNDFONT: String = "res://addons/pure_doom/assets/gzdoom.sf2"
+const SOUNDFONT: String = "res://addons/godot_doom_gdextension/assets/gzdoom.sf2"
+## The node defaults to this path too, but the libraries in bin/ were built when the addon lived at
+## addons/pure_doom, so they still bake in the old one. Setting it here works on every platform.
+const WAD: String = "res://addons/godot_doom_gdextension/assets/doom1.wad"
 
 var engine: Control ## The PureDoom node, null where the library is missing.
 var midi_player: Node ## Synthesises the engine's music, null without Godot MIDI Player.
@@ -23,6 +26,7 @@ func _ready() -> void:
 		return
 	engine = ClassDB.instantiate(&"PureDoom") as Control
 	engine.name = "PureDoom"
+	engine.set(&"wad_path", WAD)
 	engine.connect(&"exited", _on_engine_exited)
 	screen.add_child(engine)
 	_start_music()

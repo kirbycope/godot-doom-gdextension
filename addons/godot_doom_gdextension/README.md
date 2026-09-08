@@ -83,9 +83,9 @@ Prebuilt binaries for Windows, macOS and the web are in `bin/`. To rebuild, clon
 the extension API from the Godot build you run, so the bindings match it:
 
 ```powershell
-git clone --depth 1 https://github.com/godotengine/godot-cpp.git addons/pure_doom/godot-cpp
+git clone --depth 1 https://github.com/godotengine/godot-cpp.git addons/godot_doom_gdextension/godot-cpp
 & 'C:\Godot\godot.exe' --headless --dump-extension-api      # writes extension_api.json
-cd addons/pure_doom
+cd addons/godot_doom_gdextension
 scons platform=windows target=template_debug custom_api_file=..\..\extension_api.json
 scons platform=windows target=template_release custom_api_file=..\..\extension_api.json
 scons platform=web threads=no target=template_release custom_api_file=..\..\extension_api.json
@@ -95,9 +95,9 @@ On macOS the same steps with `brew install scons` and the Xcode Command Line Too
 (arm64 and x86_64) framework:
 
 ```sh
-git clone --depth 1 https://github.com/godotengine/godot-cpp.git addons/pure_doom/godot-cpp
+git clone --depth 1 https://github.com/godotengine/godot-cpp.git addons/godot_doom_gdextension/godot-cpp
 /Applications/Godot.app/Contents/MacOS/Godot --headless --dump-extension-api   # writes extension_api.json
-cd addons/pure_doom
+cd addons/godot_doom_gdextension
 scons platform=macos arch=universal target=template_debug custom_api_file=../../extension_api.json
 scons platform=macos arch=universal target=template_release custom_api_file=../../extension_api.json
 ```

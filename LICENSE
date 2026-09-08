@@ -22,12 +22,12 @@ SOFTWARE.
 
 ---
 
-This licence covers the wrapper written for this repository: `addons/pure_doom/src/`,
-the GDScript under `addons/pure_doom/scripts/`, the scenes, resources and tests.
+This licence covers the wrapper written for this repository: `addons/godot_doom_gdextension/src/`,
+the GDScript under `addons/godot_doom_gdextension/scripts/`, the scenes, resources and tests.
 
-It does not cover the bundled DOOM engine. `addons/pure_doom/thirdparty/PureDOOM.h` is
+It does not cover the bundled DOOM engine. `addons/godot_doom_gdextension/thirdparty/PureDOOM.h` is
 Daivuk's port of the id Software DOOM source and is GPL 2.0; its terms are in
-`addons/pure_doom/thirdparty/LICENSE`. The prebuilt libraries in `addons/pure_doom/bin/`
+`addons/godot_doom_gdextension/thirdparty/LICENSE`. The prebuilt libraries in `addons/godot_doom_gdextension/bin/`
 are compiled from it, so anything you distribute that links them is bound by that licence
-too. `addons/pure_doom/assets/doom1.wad` is id Software's freely redistributable shareware
-IWAD and is not MIT either. See the credits table in `addons/pure_doom/README.md`.
+too. `addons/godot_doom_gdextension/assets/doom1.wad` is id Software's freely redistributable shareware
+IWAD and is not MIT either. See the credits table in `addons/godot_doom_gdextension/README.md`.

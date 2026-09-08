@@ -33,7 +33,7 @@ jobs:
       - name: Import project
         run: godot --headless --path "$PWD" --import --quit
 
-      # No Linux library ships in addons/pure_doom/bin, so every engine test skips itself here; the
+      # No Linux library ships in addons/godot_doom_gdextension/bin, so every engine test skips itself here; the
       # GDScript around the node (the controls card) is what this job covers.
       - name: Run Tests
         env:

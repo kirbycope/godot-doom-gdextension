@@ -3,7 +3,7 @@ extends GutTest
 ## Purpose: The demo scene boots the engine full screen with the controls card, wires the music up when Godot
 ## MIDI Player is present, and says so instead of failing where the library is not built.
 
-const DEMO_SCENE = preload("res://addons/pure_doom/scenes/demo/demo.tscn")
+const DEMO_SCENE = preload("res://addons/godot_doom_gdextension/scenes/demo/demo.tscn")
 
 var demo: PureDoomDemo
 
