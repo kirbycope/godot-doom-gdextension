@@ -45,7 +45,20 @@ func _start_music() -> void:
 	midi_player = (load(MIDI_PLAYER_SCENE) as PackedScene).instantiate()
 	midi_player.set(&"soundfont", SOUNDFONT)
 	add_child(midi_player)
+	_force_stream_playback()
 	engine.connect(&"midi_message", Callable(midi_player, &"receive_raw_midi_message"))
+
+
+## Godot's web export plays an AudioStreamWAV as a sample by default, handing it straight to WebAudio and
+## skipping the bus chain and the per-note volume the synthesiser writes every frame, so the music comes out
+## silent while DOOM's own sound, an AudioStreamGenerator that cannot be sampled, still plays. The voices want
+## stream playback, which is what every other platform gives them anyway.
+func _force_stream_playback() -> void:
+	for player: AudioStreamPlayer in midi_player.get(&"audio_stream_players"):
+		player.playback_type = AudioServer.PLAYBACK_TYPE_STREAM
+		var linked: AudioStreamPlayer = player.get_node(^"Linked") as AudioStreamPlayer
+		if linked != null:
+			linked.playback_type = AudioServer.PLAYBACK_TYPE_STREAM
 
 
 ## DOOM turns with relative mouse motion, so the cursor is hidden and held in the window while it plays.

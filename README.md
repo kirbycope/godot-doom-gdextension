@@ -45,7 +45,10 @@ scene can fall back to something else where it is not.
 
 Music is optional. `addons/midi/` here is [Godot MIDI Player](https://bitbucket.org/arlez80/godot-midi-player-g4)
 (MIT), bundled so the demo has sound; copy it across as well if you want DOOM's music, then connect the
-node's `midi_message` signal to the player's `receive_raw_midi_message`. The addon works without it.
+node's `midi_message` signal to the player's `receive_raw_midi_message`. The addon works without it. On web,
+also put the synthesiser's voices on `AudioServer.PLAYBACK_TYPE_STREAM`, or the browser's default sample
+playback skips the bus chain the synthesiser mixes through and the music comes out silent; this project sets
+`audio/general/default_playback_type.web` to `Stream` as well.
 
 See `addons/godot_doom_gdextension/README.md` for the node's properties, signals, methods and the controls card.
 

@@ -45,6 +45,23 @@ func test_music_is_wired_to_the_midi_player_when_it_is_installed() -> void:
 	assert_gt(demo.midi_player.get_now_playing_polyphony(), 0, "E1M1's music should be sounding")
 
 
+## The web export plays an AudioStreamWAV as a sample by default, which skips the bus chain and the per-note
+## volume the synthesiser writes, so its voices are silenced there unless they are put back on stream playback.
+func test_the_voices_play_as_streams_rather_than_samples() -> void:
+	if not ClassDB.class_exists(&"PureDoom"):
+		pass_test("PureDoom is not built for this platform")
+		return
+	if not ResourceLoader.exists(PureDoomDemo.MIDI_PLAYER_SCENE):
+		pass_test("Godot MIDI Player is not installed")
+		return
+	var voices: Array = demo.midi_player.get(&"audio_stream_players")
+	assert_gt(voices.size(), 0, "The synthesiser should have brought its voices up")
+	for player: AudioStreamPlayer in voices:
+		assert_eq(player.playback_type, AudioServer.PLAYBACK_TYPE_STREAM, "%s should be a stream" % player.name)
+		var linked: AudioStreamPlayer = player.get_node(^"Linked") as AudioStreamPlayer
+		assert_eq(linked.playback_type, AudioServer.PLAYBACK_TYPE_STREAM, "and so should its linked sample")
+
+
 func test_the_engine_quitting_stops_the_music_and_reports_the_code() -> void:
 	if not ClassDB.class_exists(&"PureDoom"):
 		pass_test("PureDoom is not built for this platform")

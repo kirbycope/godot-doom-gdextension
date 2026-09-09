@@ -54,6 +54,21 @@ SoundFont that is one line:
 doom.midi_message.connect(midi_player.receive_raw_midi_message)
 ```
 
+On a web export that line is not quite enough. Godot defaults `audio/general/default_playback_type.web` to
+`Sample`, which hands an `AudioStreamWAV` straight to WebAudio and skips the bus chain and the per-note
+volume a software synthesiser writes every frame, so the music plays silently while DOOM's own sound, an
+`AudioStreamGenerator` that cannot be sampled, still comes through. Put the synthesiser's voices back on
+stream playback after it is in the tree, as `scenes/demo/demo.gd` does:
+
+```gdscript
+for player: AudioStreamPlayer in midi_player.audio_stream_players:
+	player.playback_type = AudioServer.PLAYBACK_TYPE_STREAM
+	player.get_node(^"Linked").playback_type = AudioServer.PLAYBACK_TYPE_STREAM
+```
+
+Setting `audio/general/default_playback_type.web` to `Stream` in the project settings does the same thing for
+every `AudioStreamWAV` in the project at once; this project sets both.
+
 Controls: WASD walks and strafes, the mouse turns, left click and Ctrl fire, Space uses, Shift runs, Tab is
 the automap, 1 to 7 pick weapons, backquote (`) opens DOOM's menu (Enter picks, backquote closes), and the
 letters stay themselves so the cheat codes can be typed. On a pad the left stick walks and strafes, the right
