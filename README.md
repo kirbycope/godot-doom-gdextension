@@ -3,8 +3,16 @@
 # Godot Doom GDExtension
 
 The real DOOM engine running inside Godot 4.8 as a GDExtension node. This repository is the Godot project
-that builds, demos and tests the addon; the addon itself is `addons/godot_doom_gdextension/`, and that is the only folder
-you copy into a game.
+that builds, demos and tests the addon; the addon itself lives in
+[godot-doom-gdextension-addon](https://github.com/kirbycope/godot-doom-gdextension-addon) and is mounted here
+as a submodule at `addons/godot_doom_gdextension/`, so clone with it:
+
+```powershell
+git clone --recurse-submodules https://github.com/kirbycope/godot-doom-gdextension.git
+```
+
+An existing clone catches up with `git submodule update --init --recursive`. Edit the addon in its own
+repository, push there, then bump the pointer here.
 
 The engine is [PureDOOM](https://github.com/Daivuk/PureDOOM), Daivuk's single-header C port of the 1993 id
 Software source with no OS layer of its own. The extension supplies its time, file, print and environment
@@ -31,7 +39,13 @@ interstitial does not appear anywhere else.
 
 ## Installing into your own project
 
-Copy `addons/godot_doom_gdextension/` into your project's `addons/` folder. Nothing needs enabling in Project Settings:
+Take the addon repository as a submodule, which is how the projects here consume it:
+
+```powershell
+git submodule add https://github.com/kirbycope/godot-doom-gdextension-addon.git addons/godot_doom_gdextension
+```
+
+Copying `addons/godot_doom_gdextension/` in by hand works too. Nothing needs enabling in Project Settings:
 the `.gdextension` file registers the `PureDoom` node itself, and the GDScript uses `class_name`. Then:
 
 ```gdscript

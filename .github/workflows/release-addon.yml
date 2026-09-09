@@ -30,6 +30,8 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          # The addon is a submodule; without this it checks out empty and the zip ships nothing.
+          submodules: recursive
 
       - name: Compute next version
         id: version
