@@ -1,4 +1,9 @@
 name: GUT Unit Tests
+
+# The other addons here test inside the barichello/godot-ci:4.7 container, which cannot run this one:
+# the GDExtension declares compatibility_minimum 4.8, so on 4.7 the library refuses to load and every
+# test that touches the PureDoom node fails. This downloads the same Godot the Pages workflow uses.
+
 on:
   push:
     branches:
@@ -7,57 +12,57 @@ on:
     branches:
       - main
 
+env:
+  GODOT_VERSION: 4.8-dev4
+  ADDON: godot_doom_gdextension
+
 jobs:
   gut:
     runs-on: ubuntu-latest
-
-    env:
-      HOME: /tmp/godot-home
-      XDG_CONFIG_HOME: /tmp/godot-home/.config
-      XDG_CACHE_HOME: /tmp/godot-home/.cache
-
-    container:
-      image: "barichello/godot-ci:4.7"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Install Godot runtime deps
+      - name: Install Godot
         shell: bash
         run: |
           set -euo pipefail
-          apt-get update
-          apt-get install -y --no-install-recommends libfontconfig1
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}"
+          curl -fsSL -o godot.zip "${base}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          unzip -q godot.zip
+          mv "Godot_v${GODOT_VERSION}_linux.x86_64" /usr/local/bin/godot
+          chmod +x /usr/local/bin/godot
 
       - name: Put the addon where the demo project expects it
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "demo/addons/godot_doom_gdextension"
+          mkdir -p "demo/addons/${ADDON}"
           # Anchored: unanchored, 'demo' would also match scenes/demo/, the demo scene itself.
           rsync -a --exclude '/.git' --exclude '/.github' --exclude '/demo' \
-                --exclude '/.gitignore' --exclude '/.gitattributes' ./ "demo/addons/godot_doom_gdextension/"
+                --exclude '/.gitignore' --exclude '/.gitattributes' ./ "demo/addons/${ADDON}/"
 
       - name: Import project
+        shell: bash
         run: |
+          set -euo pipefail
           for _ in 1 2 3 4; do
-            godot --headless --path "$PWD/demo" --import --quit
+            godot --headless --path "$PWD/demo" --import
           done
 
-      # No Linux library ships in addons/godot_doom_gdextension/bin, so every engine test skips itself here; the
-      # GDScript around the node (the controls card) is what this job covers.
-      - name: Run Tests
+      - name: Run tests
+        shell: bash
         env:
           GODOT_DISABLE_LEAK_CHECKS: "1"
         run: |
-          mkdir -p test-results
+          set -euo pipefail
+          mkdir -p demo/test-results
           godot \
             --headless \
-            -d \
             --path "$PWD/demo" \
             -s addons/gut/gut_cmdln.gd \
-            -gconfig=res://.gutconfig.json \
+            -gdir=res://addons/godot_doom_gdextension/tests \
             -gjunit_xml_file=test-results/gut-junit.xml \
             -gcompact_mode \
             -gexit
@@ -67,5 +72,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: gut-test-reports
-          path: test-results/
+          path: demo/test-results/
           if-no-files-found: warn
