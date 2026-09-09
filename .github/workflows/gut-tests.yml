@@ -23,8 +23,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          # The addons are submodules; without this they check out empty and every test fails.
-          submodules: recursive
 
       - name: Install Godot runtime deps
         shell: bash
@@ -33,8 +31,20 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends libfontconfig1
 
+      - name: Put the addon where the demo project expects it
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "demo/addons/godot_doom_gdextension"
+          # Anchored: unanchored, 'demo' would also match scenes/demo/, the demo scene itself.
+          rsync -a --exclude '/.git' --exclude '/.github' --exclude '/demo' \
+                --exclude '/.gitignore' --exclude '/.gitattributes' ./ "demo/addons/godot_doom_gdextension/"
+
       - name: Import project
-        run: godot --headless --path "$PWD" --import --quit
+        run: |
+          for _ in 1 2 3 4; do
+            godot --headless --path "$PWD/demo" --import --quit
+          done
 
       # No Linux library ships in addons/godot_doom_gdextension/bin, so every engine test skips itself here; the
       # GDScript around the node (the controls card) is what this job covers.
@@ -46,7 +56,7 @@ jobs:
           godot \
             --headless \
             -d \
-            --path "$PWD" \
+            --path "$PWD/demo" \
             -s addons/gut/gut_cmdln.gd \
             -gconfig=res://.gutconfig.json \
             -gjunit_xml_file=test-results/gut-junit.xml \

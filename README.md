@@ -1,102 +1,150 @@
-![Preview](./addons/godot_doom_gdextension/assets/godot-doom-gdextension.png)
+![Preview](./assets/godot-doom-gdextension.png)
 
 # Godot Doom GDExtension
 
-The real DOOM engine running inside Godot 4.8 as a GDExtension node. This repository is the Godot project
-that builds, demos and tests the addon; the addon itself lives in
-[godot-doom-gdextension-addon](https://github.com/kirbycope/godot-doom-gdextension-addon) and is mounted here
-as a submodule at `addons/godot_doom_gdextension/`, so clone with it:
-
-```powershell
-git clone --recurse-submodules https://github.com/kirbycope/godot-doom-gdextension.git
-```
-
-An existing clone catches up with `git submodule update --init --recursive`. Edit the addon in its own
-repository, push there, then bump the pointer here.
-
-The engine is [PureDOOM](https://github.com/Daivuk/PureDOOM), Daivuk's single-header C port of the 1993 id
-Software source with no OS layer of its own. The extension supplies its time, file, print and environment
-callbacks, copies its 320x200 frame into an `ImageTexture` every tick, feeds its 11025 Hz sound into an
-`AudioStreamGenerator`, sequences its music out as `InputEventMIDI`, and turns Godot input events into DOOM
-key, button and mouse events. Everything runs in-process, so the same source builds for Windows, macOS and
-the browser as a WebAssembly side module.
+A GDExtension that runs the real DOOM engine inside Godot 4.8 and shows it on a `TextureRect`. The engine
+is [PureDOOM](https://github.com/Daivuk/PureDOOM), a single-header C port of the 1993 source with no OS
+layer of its own; this addon supplies its time, file, print and environment callbacks, copies its 320x200
+frame into an `ImageTexture` every tick, feeds its 11025 Hz sound into an `AudioStreamGenerator`, and turns
+Godot input events into DOOM key, button and mouse events. Everything runs in-process, so the same source
+builds for the Windows desktop and for the browser as a WebAssembly side module.
 
 ## Demo scene
 
-`res://addons/godot_doom_gdextension/scenes/demo/demo.tscn` is the project's main scene. Run the project and DOOM boots
-straight into E1M1 filling the window, with the controls card printed down each side and the music playing
-through the bundled `gzdoom.sf2` SoundFont. Where the library is not built for your platform the screen says
-so instead of failing.
+`scenes/demo/demo.tscn` runs the node full screen with the controls card down each side and, when Godot MIDI
+Player (`addons/midi/`) is in the project, the music through `assets/gzdoom.sf2`. It is the main scene of the
+[Godot Doom GDExtension](https://github.com/kirbycope/godot-doom-gdextension) project this addon is developed
+in, and it is also the shortest example of wiring the node up: instantiate it, connect `exited`, connect
+`midi_message` to a synthesiser, call `start()`. Where the library is not built for the platform the demo
+shows a message instead of failing.
 
-WASD walks and strafes, the mouse turns, left click and Ctrl fire, Space uses, Shift runs, Tab is the
-automap, 1 to 7 pick weapons and backquote (`) opens DOOM's menu. Pads are supported too; the full mapping
-is in `addons/godot_doom_gdextension/README.md`.
+It also shows the two things a host scene has to handle itself. DOOM turns on relative mouse motion, so the
+demo captures the cursor in `_ready()`, gives it back on Escape and takes it again on a click. And because a
+browser only grants pointer lock from inside a user gesture, a web export cannot capture at startup at all;
+the demo puts a "Click to start" `CanvasLayer` up when `OS.has_feature("web")` and captures on that first
+click. Off the web the interstitial stays hidden.
 
-DOOM turns on relative mouse motion, so the demo captures the cursor as it boots. Escape hands it back and
-clicking in the window takes it again. On a web export the browser only grants pointer lock from inside a
-user gesture, so the demo starts behind a "Click to start" screen and captures on that click; the
-interstitial does not appear anywhere else.
+## Playing the demo
 
-## Installing into your own project
+The demo runs in a browser at <https://timothycope.com/godot-doom-gdextension/>. A GitHub Action exports it on every
+push to `main` and hands it straight to Pages, so the export itself is never committed: this repository is a
+submodule of the projects that use the addon, and a web export is tens of megabytes that git cannot compress.
 
-Take the addon repository as a submodule, which is how the projects here consume it:
+`demo/` is the project that export is built from. It expects the addon at `res://addons/godot_doom_gdextension/`, which is
+where a consuming project puts it, so nothing in the addon needs a second set of paths. `demo/addons/` is
+ignored by git; fill it before running the demo locally:
 
 ```powershell
-git submodule add https://github.com/kirbycope/godot-doom-gdextension-addon.git addons/godot_doom_gdextension
+robocopy . demo/addons/godot_doom_gdextension /MIR /XD .git .github demo /XF .gitignore .gitattributes
 ```
 
-Copying `addons/godot_doom_gdextension/` in by hand works too. Nothing needs enabling in Project Settings:
-the `.gdextension` file registers the `PureDoom` node itself, and the GDScript uses `class_name`. Then:
+Then open `demo/` in Godot.
+
+---
+
+## Using the node
+
+Add a `PureDoom` node (it is a `TextureRect`) anywhere a `Control` can go, typically inside a `SubViewport`
+whose texture ends up on a screen mesh. Then:
 
 ```gdscript
 var doom: Control = ClassDB.instantiate(&"PureDoom")
 add_child(doom)
-doom.call(&"start")
+doom.call(&"start") # Boots the shareware WAD straight into E1M1
+doom.call(&"stop")  # Freezes the game where it is; start() resumes it
 ```
 
 `ClassDB.class_exists(&"PureDoom")` tells you whether the library is built for the running platform, so a
-scene can fall back to something else where it is not.
+scene can fall back to something else where it is not (the demo world falls back to a GDScript raycaster).
 
-Music is optional. `addons/midi/` here is [Godot MIDI Player](https://bitbucket.org/arlez80/godot-midi-player-g4)
-(MIT), bundled so the demo has sound; copy it across as well if you want DOOM's music, then connect the
-node's `midi_message` signal to the player's `receive_raw_midi_message`. The addon works without it. On web,
-also put the synthesiser's voices on `AudioServer.PLAYBACK_TYPE_STREAM`, or the browser's default sample
-playback skips the bus chain the synthesiser mixes through and the music comes out silent; this project sets
-`audio/general/default_playback_type.web` to `Stream` as well.
+| Property | Meaning |
+| --- | --- |
+| `wad_path` | The IWAD to load; defaults to the shareware `assets/doom1.wad`. A registered `doom.wad` works too. |
+| `mouse_sensitivity` | Mouse pixels to DOOM turn units. |
+| `skill` | 1 to 5, the `-skill` the level starts on. |
 
-See `addons/godot_doom_gdextension/README.md` for the node's properties, signals, methods and the controls card.
+The `exited` signal fires with DOOM's exit code if the engine quits or errors. The `midi_message` signal
+carries the music: DOOM's sequencer runs at 140 Hz and every message comes out as an `InputEventMIDI`,
+ready for a synthesiser. With [Godot MIDI Player](https://bitbucket.org/arlez80/godot-midi-player-g4) and a
+SoundFont that is one line:
+
+```gdscript
+doom.midi_message.connect(midi_player.receive_raw_midi_message)
+```
+
+On a web export that line is not quite enough. Godot defaults `audio/general/default_playback_type.web` to
+`Sample`, which hands an `AudioStreamWAV` straight to WebAudio and skips the bus chain and the per-note
+volume a software synthesiser writes every frame, so the music plays silently while DOOM's own sound, an
+`AudioStreamGenerator` that cannot be sampled, still comes through. Put the synthesiser's voices back on
+stream playback after it is in the tree, as `scenes/demo/demo.gd` does:
+
+```gdscript
+for player: AudioStreamPlayer in midi_player.audio_stream_players:
+	player.playback_type = AudioServer.PLAYBACK_TYPE_STREAM
+	player.get_node(^"Linked").playback_type = AudioServer.PLAYBACK_TYPE_STREAM
+```
+
+Setting `audio/general/default_playback_type.web` to `Stream` in the project settings does the same thing for
+every `AudioStreamWAV` in the project at once; this project sets both.
+
+Controls: WASD walks and strafes, the mouse turns, left click and Ctrl fire, Space uses, Shift runs, Tab is
+the automap, 1 to 7 pick weapons, backquote (`) opens DOOM's menu (Enter picks, backquote closes), and the
+letters stay themselves so the cheat codes can be typed. On a pad the left stick walks and strafes, the right
+stick turns (it presses DOOM's left and right arrows, so Y for run applies), RT and X fire, A uses, Y runs,
+B accepts, Back opens the menu, and the d-pad is context-sensitive: with the menu up it is the arrow keys,
+in the game up is the automap, down is the menu, and left and right cycle to the previous or next weapon you
+own (`cycle_weapon` reads the engine's weapon list, presses the slot's number and lets go two tics later).
+`is_menu_open()`, `is_automap_open()` and `get_weapon_slot()` expose the same engine state. The level starts directly (`-warp 1 1`)
+because Escape and Start are left to the host scene; after dying, use restarts the level.
+
+## Controls card
+
+`scenes/pure_doom_controls_overlay.tscn` is a `CanvasLayer` that prints the controls in plain text down each
+side of the screen, a movement column on the left and an actions column on the right, so a scene that fills
+the middle with the monitor has the black bands documented. What it prints comes from
+`resources/controls.tres`, a `PureDoomControls` resource: two lists of `PureDoomControl` lines, each with the
+DOOM action's name and the input for it written out for `keyboard`, `xbox`, `nintendo` and `playstation`.
+Set the overlay's `input_type` to one of those (or `touch`, which shows the Xbox wording) from whatever
+detects the device, and lines with no text for that device are dropped, so the weapon slots and the strafe
+modifier only appear on the keyboard. The card describes the mapping in `pure_doom.cpp`; editing the `.tres`
+changes the wording, not the mapping.
+
+Config and save files go to `user://pure_doom/`. PureDOOM keeps one global engine, so only one `PureDoom`
+node can run in a process and it initialises once; `stop()` and `start()` pause and resume it.
 
 ## Building
 
-Prebuilt Windows, macOS and web libraries are committed in `addons/godot_doom_gdextension/bin/`, so the demo runs from a
-fresh clone. Rebuilding needs `godot-cpp` (git-ignored) and an `extension_api.json` dumped from the Godot
-build you run, so the bindings match it:
+Prebuilt binaries for Windows, macOS and the web are in `bin/`. To rebuild, clone godot-cpp into this folder (it is git-ignored) and dump
+the extension API from the Godot build you run, so the bindings match it:
 
 ```powershell
-git clone --depth 1 https://github.com/godotengine/godot-cpp.git addons/godot_doom_gdextension/godot-cpp
-& 'C:\Godot\godot.exe' --headless --dump-extension-api
-cd addons/godot_doom_gdextension
-scons platform=windows target=template_debug custom_api_file=..\..\extension_api.json
-scons platform=windows target=template_release custom_api_file=..\..\extension_api.json
+git clone --depth 1 https://github.com/godotengine/godot-cpp.git godot-cpp
+& 'C:\Godot\godot.exe' --headless --dump-extension-api      # writes extension_api.json
+scons platform=windows target=template_debug custom_api_file=extension_api.json
+scons platform=windows target=template_release custom_api_file=extension_api.json
+scons platform=web threads=no target=template_release custom_api_file=extension_api.json
 ```
 
-Windows needs Visual Studio 2022 with the C++ workload, Python and SCons; macOS needs `brew install scons`
-and the Xcode Command Line Tools; the web build needs the Emscripten SDK on `PATH`. The macOS and web
-command lines are in `addons/godot_doom_gdextension/README.md`.
+On macOS the same steps with `brew install scons` and the Xcode Command Line Tools produce a universal
+(arm64 and x86_64) framework:
 
-## Tests
-
-GUT covers the node and the controls card. Engine tests skip themselves where the library is not built.
-
-```powershell
-& 'C:\Godot\godot.exe' --headless --path . -s addons/gut/gut_cmdln.gd -gconfig=res://.gutconfig.json -gexit
+```sh
+git clone --depth 1 https://github.com/godotengine/godot-cpp.git godot-cpp
+/Applications/Godot.app/Contents/MacOS/Godot --headless --dump-extension-api   # writes extension_api.json
+scons platform=macos arch=universal target=template_debug custom_api_file=../../extension_api.json
+scons platform=macos arch=universal target=template_release custom_api_file=../../extension_api.json
 ```
 
-## Licensing
+Windows needs Visual Studio 2022 with the C++ workload, Python and SCons. The web build needs the
+Emscripten SDK on `PATH` (`emsdk_env`), and the Web export preset needs Extension Support on and Thread
+Support off to match the `threads=no` library. Godot's `godot-cpp` `master` branch is used because the
+project runs a 4.8 development build.
 
-The wrapper in `addons/godot_doom_gdextension/src/`, the GDScript, scenes, resources and tests are MIT (`LICENSE`).
+## Credits and licenses
 
-The bundled engine is not. `addons/godot_doom_gdextension/thirdparty/PureDOOM.h` is GPL 2.0, so the libraries in
-`addons/godot_doom_gdextension/bin/` and anything you ship that links them are bound by that licence; its terms are in
-`addons/godot_doom_gdextension/thirdparty/LICENSE`. `addons/godot_doom_gdextension/assets/doom1.wad` is id Software's freely
-redistributable shareware IWAD. The full credits table is in `addons/godot_doom_gdextension/README.md`.
+| What | Author | License | Source |
+| --- | --- | --- | --- |
+| `thirdparty/PureDOOM.h` | Daivuk (David St-Louis), from the id Software DOOM source | GPL 2.0 (`thirdparty/LICENSE`) | https://github.com/Daivuk/PureDOOM |
+| `assets/doom1.wad` | id Software | DOOM shareware, freely redistributable | https://github.com/Daivuk/PureDOOM |
+| `assets/gzdoom.sf2` (GZDoom's default General MIDI SoundFont, an SC-55 preset) | ZDoom team | not recorded - fill in (ships with GZDoom, no license file of its own) | https://github.com/ZDoom/gzdoom/blob/master/soundfont/gzdoom.sf2 |
+| `src/` | this project | MIT | |
