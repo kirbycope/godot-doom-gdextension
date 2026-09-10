@@ -5,3 +5,4 @@ addons/godot_doom_gdextension/
 # Godot's import cache and the web export the Pages workflow builds.
 .godot/
 build/
+.mcp/

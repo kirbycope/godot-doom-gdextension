@@ -1,7 +1,8 @@
 extends GutTest
 
-## Purpose: The demo scene boots the engine full screen with the controls card, wires the music up when Godot
-## MIDI Player is present, and says so instead of failing where the library is not built.
+## Purpose: The demo scene boots the engine full screen with the controls card and the on-screen pad, wires
+## the music up when Godot MIDI Player is present, and says so instead of failing where the library is not
+## built.
 
 const DEMO_SCENE = preload("res://addons/godot_doom_gdextension/scenes/demo/demo.tscn")
 
@@ -29,6 +30,33 @@ func test_engine_fills_the_screen_and_the_card_shows() -> void:
 	assert_false(demo.missing.visible)
 	assert_true(demo.overlay.visible, "The controls card shows beside the screen")
 	assert_true("Fire" in demo.overlay.actions.text)
+
+
+## On a phone the pad has the screen edges and the card would only be in its way, so they swap and the monitor
+## pulls in to leave the thumb clusters clear.
+func test_the_card_gives_way_to_the_pad_on_touch() -> void:
+	if not ClassDB.class_exists(&"PureDoom"):
+		pass_test("PureDoom is not built for this platform")
+		return
+	demo._on_device_changed("touch")
+	assert_false(demo.overlay.visible, "The card steps aside")
+	assert_eq(demo.screen.offset_left, PureDoomDemo.PAD_INSET_SIDE, "and the monitor pulls in for the pad")
+	assert_eq(demo.screen.offset_bottom, -PureDoomDemo.PAD_INSET_BOTTOM)
+
+	demo._on_device_changed("xbox")
+	assert_true(demo.overlay.visible, "A pad in hand gets the card back")
+	assert_eq(demo.overlay.input_type, "xbox", "worded for what is in it")
+	assert_eq(demo.screen.offset_left, PureDoomDemo.CARD_INSET, "and the monitor goes back to full height")
+	assert_eq(demo.screen.offset_bottom, 0.0)
+
+
+## DOOM fires on mouse left and every touch arrives as an emulated mouse click, so a tap on the pad, or
+## anywhere else, would shoot.
+func test_touches_are_not_turned_into_mouse_clicks() -> void:
+	if not ClassDB.class_exists(&"PureDoom"):
+		pass_test("PureDoom is not built for this platform")
+		return
+	assert_false(Input.emulate_mouse_from_touch)
 
 
 func test_music_is_wired_to_the_midi_player_when_it_is_installed() -> void:

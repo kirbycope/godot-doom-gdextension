@@ -11,8 +11,9 @@ builds for the Windows desktop and for the browser as a WebAssembly side module.
 
 ## Demo scene
 
-`scenes/demo/demo.tscn` runs the node full screen with the controls card down each side and, when Godot MIDI
-Player (`addons/midi/`) is in the project, the music through `assets/gzdoom.sf2`. It is the main scene of the
+`scenes/demo/demo.tscn` runs the node full screen with the controls card down each side, an on-screen pad for
+a player with no keyboard, and, when Godot MIDI Player (`addons/midi/`) is in the project, the music through
+`assets/gzdoom.sf2`. It is the main scene of the
 [Godot Doom GDExtension](https://github.com/kirbycope/godot-doom-gdextension) project this addon is developed
 in, and it is also the shortest example of wiring the node up: instantiate it, connect `exited`, connect
 `midi_message` to a synthesiser, call `start()`. Where the library is not built for the platform the demo
@@ -22,7 +23,8 @@ It also shows the two things a host scene has to handle itself. DOOM turns on re
 demo captures the cursor in `_ready()`, gives it back on Escape and takes it again on a click. And because a
 browser only grants pointer lock from inside a user gesture, a web export cannot capture at startup at all;
 the demo puts a "Click to start" `CanvasLayer` up when `OS.has_feature("web")` and captures on that first
-click. Off the web the interstitial stays hidden.
+click. Off the web the interstitial stays hidden. On a touchscreen it captures nothing: there is no relative
+motion to read, and holding the pointer would make the browser's emulated mouse events look like a mouse.
 
 ## Playing the demo
 
@@ -31,8 +33,10 @@ push to `main` and hands it straight to Pages, so the export itself is never com
 submodule of the projects that use the addon, and a web export is tens of megabytes that git cannot compress.
 
 `demo/` is the project that export is built from. It expects the addon at `res://addons/godot_doom_gdextension/`, which is
-where a consuming project puts it, so nothing in the addon needs a second set of paths. `demo/addons/` is
-ignored by git; fill it before running the demo locally:
+where a consuming project puts it, so nothing in the addon needs a second set of paths. It also takes
+[godot-controls](https://github.com/kirbycope/godot-controls) as a submodule at `demo/addons/controls`, for
+the on-screen pad, so clone with `--recurse-submodules` or run `git submodule update --init` afterwards.
+`demo/addons/godot_doom_gdextension` is ignored by git; fill it before running the demo locally:
 
 ```powershell
 robocopy . demo\addons\godot_doom_gdextension /MIR /XD "$PWD\.git" "$PWD\.github" "$PWD\demo" "$PWD\.godot" /XF .gitignore .gitattributes
@@ -97,8 +101,33 @@ stick turns (it presses DOOM's left and right arrows, so Y for run applies), RT 
 B accepts, Back opens the menu, and the d-pad is context-sensitive: with the menu up it is the arrow keys,
 in the game up is the automap, down is the menu, and left and right cycle to the previous or next weapon you
 own (`cycle_weapon` reads the engine's weapon list, presses the slot's number and lets go two tics later).
+On a touchscreen the demo's on-screen pad drives that same pad mapping, so the browser demo plays on a phone.
 `is_menu_open()`, `is_automap_open()` and `get_weapon_slot()` expose the same engine state. The level starts directly (`-warp 1 1`)
 because Escape and Start are left to the host scene; after dying, use restarts the level.
+
+## On-screen pad
+
+`scripts/pure_doom_virtual_pad.gd` is what makes the browser demo playable on a phone. It is a plain `Node`
+that looks for [godot-controls](https://github.com/kirbycope/godot-controls) at `res://addons/controls/`,
+and where that addon is installed it instances the HUD, puts a `doom_*` action on every slot DOOM has a use
+for, names each button after what the engine does with it, and turns the taps back into the joypad events
+`pure_doom.cpp` already reads. The engine's pad mapping is the whole implementation: a virtual pad needs no
+new engine code, only a translation from the addon's actions to the buttons and axes that mapping expects.
+
+Slots DOOM does nothing with - the shoulders, the left trigger, Start - are left blank, and the addon hides a
+blank slot. The vertical half of the right stick is filled even though the engine ignores it, because the
+addon hides a stick whose vertical pair is blank and turning is what that stick is for.
+
+Buttons and sticks are read differently on purpose. A `TouchScreenButton` sends an `InputEventAction`, so the
+buttons are listened for in `_input`, and nothing else in Godot sends one - a real key or pad reaches
+`PureDoom` on its own and must not arrive twice. Godot's `VirtualJoystick` presses its actions straight into
+the input state without sending an event, so the sticks are read in `_process` instead, and only while the pad
+is on screen.
+
+The pad is up for touch alone. A keyboard or a real controller has buttons of its own and gets the controls
+card instead, which words itself for whichever of them is in hand; the two never share the screen, and the
+monitor pulls in to leave the thumb clusters clear whenever the pad is up. The addon is optional the same way
+Godot MIDI Player is: without it the node does nothing and the demo runs exactly as it did.
 
 ## Controls card
 
@@ -147,6 +176,7 @@ project runs a 4.8 development build.
 
 | What | Author | License | Source |
 | --- | --- | --- | --- |
+| `demo/addons/controls` | Tim Cope | MIT | https://github.com/kirbycope/godot-controls |
 | `thirdparty/PureDOOM.h` | Daivuk (David St-Louis), from the id Software DOOM source | GPL 2.0 (`thirdparty/LICENSE`) | https://github.com/Daivuk/PureDOOM |
 | `assets/doom1.wad` | id Software | DOOM shareware, freely redistributable | https://github.com/Daivuk/PureDOOM |
 | `assets/gzdoom.sf2` (GZDoom's default General MIDI SoundFont, an SC-55 preset) | ZDoom team | not recorded - fill in (ships with GZDoom, no license file of its own) | https://github.com/ZDoom/gzdoom/blob/master/soundfont/gzdoom.sf2 |
