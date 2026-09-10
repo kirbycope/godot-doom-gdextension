@@ -1,3 +1,5 @@
+![Preview](addons/godot_doom_gdextension/assets/godot-doom-gdextension.png)
+
 # Godot Doom GDExtension
 
 PureDOOM, the single-header port of the 1993 engine, as a GDExtension you can drop on any surface.
