@@ -23,6 +23,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          # The demo takes the controls addon as a submodule, for the on-screen pad.
+          submodules: recursive
 
       - name: Install Godot
         shell: bash
