@@ -114,9 +114,11 @@ for, names each button after what the engine does with it, and turns the taps ba
 `pure_doom.cpp` already reads. The engine's pad mapping is the whole implementation: a virtual pad needs no
 new engine code, only a translation from the addon's actions to the buttons and axes that mapping expects.
 
-Slots DOOM does nothing with - the shoulders, the left trigger, Start - are left blank, and the addon hides a
-blank slot. The vertical half of the right stick is filled even though the engine ignores it, because the
-addon hides a stick whose vertical pair is blank and turning is what that stick is for.
+Slots DOOM does nothing with - the shoulders, the triggers, Start - are left blank, and the addon hides a
+blank slot. Back is left blank too even though the engine reads it, because the d-pad's down arm already
+opens DOOM's menu and one menu button is enough. The share button is left to the addon, which puts its own
+screenshot on it. The vertical half of the right stick is filled even though the engine ignores it, because
+the addon hides a stick whose vertical pair is blank and turning is what that stick is for.
 
 Buttons and sticks are read differently on purpose. A `TouchScreenButton` sends an `InputEventAction`, so the
 buttons are listened for in `_input`, and nothing else in Godot sends one - a real key or pad reaches

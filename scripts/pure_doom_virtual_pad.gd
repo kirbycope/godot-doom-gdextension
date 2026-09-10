@@ -20,18 +20,18 @@ const TOUCH: int = 4
 const CARD_INPUT_TYPES: Array[String] = ["keyboard", "xbox", "nintendo", "playstation", "touch"]
 
 ## The joypad axes this pad fills, so [method _process] asks about no others.
-const AXES: Array[int] = [JOY_AXIS_LEFT_X, JOY_AXIS_LEFT_Y, JOY_AXIS_RIGHT_X, JOY_AXIS_RIGHT_Y, JOY_AXIS_TRIGGER_RIGHT]
+const AXES: Array[int] = [JOY_AXIS_LEFT_X, JOY_AXIS_LEFT_Y, JOY_AXIS_RIGHT_X, JOY_AXIS_RIGHT_Y]
 
 ## Each slot this pad uses, as the controls addon names it, with the action to put on it and the joypad event
 ## [PureDoom] reads that action as. A slot missing from here is left blank, and the addon hides a blank slot:
-## the shoulders, the left trigger and the Start button, none of which DOOM does anything with.
+## the shoulders, the triggers and the Start button, none of which DOOM does anything with. The Back button is
+## left out too, even though the engine reads it: the d-pad's down arm already opens DOOM's menu, and one menu
+## button is enough. The share button is left to the addon, which puts its own screenshot on it.
 const SLOTS: Dictionary = {
 	"button_0": {"action": &"doom_use", "button": JOY_BUTTON_A},
 	"button_1": {"action": &"doom_confirm", "button": JOY_BUTTON_B},
 	"button_2": {"action": &"doom_fire", "button": JOY_BUTTON_X},
 	"button_3": {"action": &"doom_run", "button": JOY_BUTTON_Y},
-	"button_4": {"action": &"doom_menu", "button": JOY_BUTTON_BACK},
-	"axis_5_plus": {"action": &"doom_fire_trigger", "axis": JOY_AXIS_TRIGGER_RIGHT, "value": 1.0},
 	"button_11": {"action": &"doom_dpad_up", "button": JOY_BUTTON_DPAD_UP},
 	"button_12": {"action": &"doom_dpad_down", "button": JOY_BUTTON_DPAD_DOWN},
 	"button_13": {"action": &"doom_dpad_left", "button": JOY_BUTTON_DPAD_LEFT},
@@ -55,8 +55,9 @@ const LABELS: Dictionary = {
 	"button_1": "Pick",
 	"button_2": "Fire",
 	"button_3": "Run",
-	"button_4": "Menu",
-	"axis_5_plus": "Fire",
+	# Not a slot this pad fills: the addon puts its own screenshot on the share button, and set_labels clears
+	# every label it is not given, so the word has to be repeated here to survive.
+	"button_15": "Screenshot",
 	"button_11": "Automap",
 	"button_12": "Menu",
 	"button_13": "Prev",
@@ -71,8 +72,7 @@ const LABEL_PROPERTIES: Dictionary = {
 	"button_1": "joypad_button_1_label",
 	"button_2": "joypad_button_2_label",
 	"button_3": "joypad_button_3_label",
-	"button_4": "joypad_button_4_label",
-	"axis_5_plus": "joypad_axis_5_plus_label",
+	"button_15": "joypad_button_15_label",
 	"button_11": "joypad_button_11_label",
 	"button_12": "joypad_button_12_label",
 	"button_13": "joypad_button_13_label",
