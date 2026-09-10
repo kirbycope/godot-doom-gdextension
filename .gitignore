@@ -8,3 +8,7 @@ extension_api.json
 
 # The GDExtension's own build output is ignored by addons/godot_doom_gdextension/.gitignore, which
 # travels with the addon so it works the same wherever the addon is dropped.
+
+# Fetched by tools/pull_addons.py, never committed here.
+.addon_cache/
+addons/controls/

@@ -23,8 +23,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          # The demo takes the controls addon as a submodule, for the on-screen pad.
-          submodules: recursive
+      - name: Fetch the addon dependencies
+        shell: bash
+        run: python tools/pull_addons.py
+
 
       - name: Install Godot
         shell: bash
