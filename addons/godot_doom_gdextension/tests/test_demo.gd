@@ -1,8 +1,9 @@
 extends GutTest
 
-## Purpose: The demo scene boots the engine full screen with the controls card and the on-screen pad, wires
-## the music up when Godot MIDI Player is present, and says so instead of failing where the library is not
-## built.
+## Purpose: The demo scene boots the engine full screen with the controls HUD around it, wires the music up
+## when Godot MIDI Player is present, and says so instead of failing where the library is not built. The HUD
+## is the controls addon itself, instanced in the scene, so what is checked here is the wiring: the slots are
+## mapped, the actions they name exist, and each one is labelled with what DOOM does with it.
 
 const DEMO_SCENE = preload("res://addons/godot_doom_gdextension/scenes/demo/demo.tscn")
 
@@ -28,26 +29,41 @@ func test_engine_fills_the_screen_and_the_card_shows() -> void:
 	assert_eq(demo.engine.get_parent(), demo.screen, "It belongs in the aspect ratio container")
 	assert_true(demo.engine.call(&"is_running"), "The demo boots straight into E1M1")
 	assert_false(demo.missing.visible)
-	assert_true(demo.overlay.visible, "The controls card shows beside the screen")
-	assert_true("Fire" in demo.overlay.actions.text)
+	assert_true(demo.controls.visible, "The HUD shows around the screen")
+	assert_eq(demo.controls.joypad_button_2_label.text, "Fire")
 
 
-## On a phone the pad has the screen edges and the card would only be in its way, so they swap and the monitor
-## pulls in to leave the thumb clusters clear.
-func test_the_card_gives_way_to_the_pad_on_touch() -> void:
-	if not ClassDB.class_exists(&"PureDoom"):
-		pass_test("PureDoom is not built for this platform")
-		return
-	demo._on_device_changed("touch")
-	assert_false(demo.overlay.visible, "The card steps aside")
-	assert_eq(demo.screen.offset_left, PureDoomDemo.PAD_INSET_SIDE, "and the monitor pulls in for the pad")
-	assert_eq(demo.screen.offset_bottom, -PureDoomDemo.PAD_INSET_BOTTOM)
+## The HUD is the controls addon, and the mapping lives in the inherited scene rather than in code, so this
+## is what catches a slot cleared or renamed in the editor by accident.
+func test_every_button_the_game_uses_is_mapped_in_the_scene() -> void:
+	for slot: String in PureDoomControls.JOYPAD:
+		assert_ne(String(demo.controls.get(&"action_" + slot)), "", "%s should name an action" % slot)
+	for slot: String in PureDoomControls.AXES:
+		assert_ne(String(demo.controls.get(&"action_" + slot)), "", "%s should name an action" % slot)
 
-	demo._on_device_changed("xbox")
-	assert_true(demo.overlay.visible, "A pad in hand gets the card back")
-	assert_eq(demo.overlay.input_type, "xbox", "worded for what is in it")
-	assert_eq(demo.screen.offset_left, PureDoomDemo.CARD_INSET, "and the monitor goes back to full height")
-	assert_eq(demo.screen.offset_bottom, 0.0)
+
+## The addon registers any action a slot names that the project has not declared, so every one of them exists
+## by the time the HUD is ready. A slot naming an action nothing registers is a dead button that still draws.
+func test_the_addon_registered_every_action_the_slots_name() -> void:
+	for slot: String in PureDoomControls.JOYPAD:
+		var action: StringName = demo.controls.get(&"action_" + slot)
+		assert_true(InputMap.has_action(action), "%s is registered" % action)
+
+
+## A blank slot is a button the game does not use, and the addon hides it. DOOM has nothing on the shoulders,
+## the left trigger or the stick clicks.
+func test_the_buttons_the_game_does_not_use_are_left_blank() -> void:
+	for slot: String in ["button_7", "button_8", "button_9", "button_10", "axis_4_plus"]:
+		assert_eq(String(demo.controls.get(&"action_" + slot)), "", "%s is not a button here" % slot)
+
+
+func test_the_slots_are_labelled_with_what_doom_does() -> void:
+	assert_eq(demo.controls.joypad_button_0_label.text, "Use")
+	assert_eq(demo.controls.joypad_button_1_label.text, "Pick")
+	assert_eq(demo.controls.joypad_button_2_label.text, "Fire")
+	assert_eq(demo.controls.joypad_button_3_label.text, "Run")
+	assert_eq(demo.controls.left_joystick_label.text, "Move")
+	assert_eq(demo.controls.right_joystick_label.text, "Turn")
 
 
 ## DOOM fires on mouse left and every touch arrives as an emulated mouse click, so a tap on the pad, or
@@ -98,7 +114,7 @@ func test_the_engine_quitting_stops_the_music_and_reports_the_code() -> void:
 	assert_true(demo.missing.visible)
 	assert_true("code 0" in demo.missing.text, "The exit code should be reported on screen")
 	assert_false(demo.engine.visible)
-	assert_false(demo.overlay.visible)
+	assert_false(demo.controls.visible)
 	assert_false(demo.mouse_captured, "Quitting DOOM should give the cursor back")
 	_assert_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
