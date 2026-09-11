@@ -13,14 +13,16 @@ It uses the layout the [Godot Asset Library](https://docs.godotengine.org/en/sta
 project you can open and edit it in:
 
 ```
-project.godot        the demo project, which is this repository
-addons/godot_doom_gdextension/the addon itself
-addons/gut/          the test runner
+project.godot                   the demo project, which is this repository
+addons/godot_doom_gdextension/  the addon itself
+addons/controls/                the on-screen input hints
+addons/midi/                    the SoundFont synthesiser for the music
+addons/gut/                     the test runner
 ```
 
 Clone it, open `project.godot` in Godot, and run the demo scene. The addon is mounted at
-`res://addons/godot_doom_gdextension/` exactly as it is in a game, so it is edited in place with nothing
-copied anywhere first. Installing through the Asset Library takes `addons/` and skips the root
+`res://addons/godot_doom_gdextension/` exactly as it is in a game, so it is edited in place with nothing copied
+anywhere first. Installing through the Asset Library takes `addons/` and skips the root
 `project.godot` as a conflict, which is why that file can live here harmlessly.
 
 ## Installing it in a game
