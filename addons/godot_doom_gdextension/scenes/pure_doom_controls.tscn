@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=33 format=3]
 
 [ext_resource type="PackedScene" path="res://addons/controls/controls.tscn" id="1_controls"]
 [ext_resource type="Script" path="res://addons/godot_doom_gdextension/scripts/pure_doom_controls.gd" id="2_script"]
@@ -16,6 +16,22 @@
 [ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tab.svg" id="14_tab_pressed"]
 [ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/mouse_left_outline.svg" id="15_mouse_left_normal"]
 [ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/mouse_left.svg" id="16_mouse_left_pressed"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tab_outline.svg" id="18_tab_outline"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tab.svg" id="19_tab"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tilde_outline.svg" id="20_tilde_outline"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tilde.svg" id="21_tilde"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_1_outline.svg" id="22_1_outline"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_1.svg" id="23_1"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_7_outline.svg" id="24_7_outline"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_7.svg" id="25_7"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_arrow_up_outline.svg" id="26_arrow_up_outline"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_arrow_up.svg" id="27_arrow_up"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_arrow_down_outline.svg" id="28_arrow_down_outline"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_arrow_down.svg" id="29_arrow_down"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_arrow_left_outline.svg" id="30_arrow_left_outline"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_arrow_left.svg" id="31_arrow_left"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_arrow_right_outline.svg" id="32_arrow_right_outline"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_arrow_right.svg" id="33_arrow_right"]
 
 [node name="PureDoomControls" instance=ExtResource("1_controls")]
 script = ExtResource("2_script")
@@ -58,6 +74,24 @@ keyboard_mouse_button_11_normal = ExtResource("13_tab_normal")
 keyboard_mouse_button_11_pressed = ExtResource("14_tab_pressed")
 keyboard_mouse_axis_5_plus_normal = ExtResource("15_mouse_left_normal")
 keyboard_mouse_axis_5_plus_pressed = ExtResource("16_mouse_left_pressed")
+; The automap is Tab, the weapons are the number row and turning is the arrows, none of which are
+; the keys the addon draws by default.
+keyboard_mouse_button_11_normal = ExtResource("18_tab_outline")
+keyboard_mouse_button_11_pressed = ExtResource("19_tab")
+keyboard_mouse_button_12_normal = ExtResource("20_tilde_outline")
+keyboard_mouse_button_12_pressed = ExtResource("21_tilde")
+keyboard_mouse_button_13_normal = ExtResource("22_1_outline")
+keyboard_mouse_button_13_pressed = ExtResource("23_1")
+keyboard_mouse_button_14_normal = ExtResource("24_7_outline")
+keyboard_mouse_button_14_pressed = ExtResource("25_7")
+keyboard_mouse_look_up_normal = ExtResource("26_arrow_up_outline")
+keyboard_mouse_look_up_pressed = ExtResource("27_arrow_up")
+keyboard_mouse_look_down_normal = ExtResource("28_arrow_down_outline")
+keyboard_mouse_look_down_pressed = ExtResource("29_arrow_down")
+keyboard_mouse_look_left_normal = ExtResource("30_arrow_left_outline")
+keyboard_mouse_look_left_pressed = ExtResource("31_arrow_left")
+keyboard_mouse_look_right_normal = ExtResource("32_arrow_right_outline")
+keyboard_mouse_look_right_pressed = ExtResource("33_arrow_right")
 
 [node name="Label" parent="BottomRight/JoypadButton0" index="0"]
 text = "Use"

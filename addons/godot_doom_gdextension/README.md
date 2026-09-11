@@ -129,9 +129,10 @@ works out which device is in hand there and everything it draws hangs off that. 
 the HUD from the scene's own text, so a game that swaps labels for a different screen has to put them back
 when `contextual_labels_requested` fires.
 
-Known gap, and it belongs in the addon rather than here: the key face is exported for each face button, so
-Space, Ctrl, Shift and Enter show as they should, but the stick and d-pad are hard-wired to WASD and IJKL.
-DOOM's automap is Tab and its weapons are the number row, so that half of the keyboard art is still wrong.
+The keyboard art names DOOM's own keys throughout, not the addon's defaults: Space, Ctrl, Shift and Enter on
+the face buttons, Tab for the automap, the number row for the weapons, the arrows for turning and the left
+mouse button on the trigger slot. Every one of those is a `keyboard_mouse_*` texture set in the inherited
+scene.
 
 Config and save files go to `user://pure_doom/`. PureDOOM keeps one global engine, so only one `PureDoom`
 node can run in a process and it initialises once; `stop()` and `start()` pause and resume it.
