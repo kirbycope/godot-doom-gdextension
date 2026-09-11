@@ -1,9 +1,9 @@
 {
   "controls": {
-    "commit": "0a9486f6ecc6bbbc6b691d4430721f566da054ef",
-    "pulled": "2026-09-11T20:03:00Z",
+    "commit": "b4ad573582c5c2181306981c9afc6f21ccd74ac8",
+    "pulled": "2026-09-11T22:22:56Z",
     "ref": "main",
     "repo": "https://github.com/kirbycope/godot-controls.git",
-    "subject": "Export the stick and d-pad key faces, like the face buttons"
+    "subject": "Space the HUD and the world prompt from what is actually in them"
   }
 }
