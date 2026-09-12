@@ -78,7 +78,7 @@ func test_changing_level_keeps_the_engine_alive() -> void:
 	assert_gt(lit, 0, "The new level should be drawing")
 
 
-func test_pad_back_toggles_the_menu_and_dpad_cycles_weapons() -> void:
+func test_pad_back_toggles_the_menu_and_the_weapon_arms_are_the_hosts() -> void:
 	if doom == null:
 		pass_test("PureDoom is not built for this platform")
 		return
@@ -92,9 +92,29 @@ func test_pad_back_toggles_the_menu_and_dpad_cycles_weapons() -> void:
 	await _press_joy(JOY_BUTTON_BACK)
 	await wait_seconds(0.3)
 	assert_false(doom.call(&"is_menu_open"), "Back again should close it")
+	# DOOM has no previous-or-next weapon key, so the engine has no opinion about these two arms: a host
+	# walks the slots with is_weapon_owned and presses a number. What matters here is that they do nothing
+	# on their own, and in particular do not fall through to the turn arrows and spin the player round.
 	await _press_joy(JOY_BUTTON_DPAD_RIGHT)
 	await wait_seconds(1.5)
-	assert_eq(doom.call(&"get_weapon_slot"), 1, "Cycling right from the pistol skips the weapons you do not own and wraps to the fist")
+	assert_eq(doom.call(&"get_weapon_slot"), 2, "The engine leaves the weapon arms alone")
+
+
+## What a host needs to cycle weapons itself: which slot is in hand, and which of the seven are being carried.
+func test_the_engine_says_which_weapons_are_being_carried() -> void:
+	if doom == null:
+		pass_test("PureDoom is not built for this platform")
+		return
+	if not doom.has_method(&"is_weapon_owned"):
+		fail_test("This library predates is_weapon_owned; rebuild it")
+		return
+	doom.call(&"start")
+	await wait_process_frames(5)
+	assert_true(doom.call(&"is_weapon_owned", 1), "The fist is never dropped")
+	assert_true(doom.call(&"is_weapon_owned", 2), "and E1M1 starts you with the pistol")
+	assert_false(doom.call(&"is_weapon_owned", 7), "but not with the BFG")
+	assert_false(doom.call(&"is_weapon_owned", 0), "A slot outside 1 to 7 is owned by nobody")
+	assert_false(doom.call(&"is_weapon_owned", 8))
 
 
 func test_tab_toggles_the_automap() -> void:

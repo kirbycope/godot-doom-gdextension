@@ -92,10 +92,12 @@ the automap, 1 to 7 pick weapons, backquote (`) opens DOOM's menu (Enter picks, 
 letters stay themselves so the cheat codes can be typed. On a pad the left stick walks and strafes, the right
 stick turns (it presses DOOM's left and right arrows, so Y for run applies), RT and X fire, A uses, Y runs,
 B accepts, Back opens the menu, and the d-pad is context-sensitive: with the menu up it is the arrow keys,
-in the game up is the automap, down is the menu, and left and right cycle to the previous or next weapon you
-own (`cycle_weapon` reads the engine's weapon list, presses the slot's number and lets go two tics later).
+in the game up is the automap and down is the menu. Left and right cycle weapons, which the engine leaves to
+the host: DOOM has no previous-or-next weapon key at all, only the seven numbers, so `get_weapon_slot()` says
+what is in hand, `is_weapon_owned(slot)` says what is being carried, and the host walks to the next owned slot
+and presses that number. The HUD below does exactly that.
 On a touchscreen the HUD's own buttons drive that same pad mapping, so the browser demo plays on a phone.
-`is_menu_open()`, `is_automap_open()` and `get_weapon_slot()` expose the same engine state. The level starts directly (`-warp 1 1`)
+`is_menu_open()`, `is_automap_open()`, `get_weapon_slot()` and `is_weapon_owned()` expose the same engine state. The level starts directly (`-warp 1 1`)
 because Escape and Start are left to the host scene; after dying, use restarts the level.
 
 ## The controls HUD
@@ -110,9 +112,17 @@ each slot into a picker of them instead of free text.
 The labels say what a button does and never change with the device; only the art on it does. So Fire is Fire
 on X, on Square and on Ctrl, which is why the demo no longer prints a separate text card for a keyboard and
 a pad. The keyboard art names the keys `pure_doom.cpp` itself answers to: Space uses, Enter picks, Ctrl
-fires, Shift runs, Tab is the automap, backquote opens DOOM's menu, and the d-pad's weapon arms carry 1 and
-7, the ends of the number row that picks weapons on a keyboard. Those keys are registered on the same
-actions, so a button lights up for its key as well as for its pad button.
+fires, Shift runs, Tab is the automap and backquote opens DOOM's menu. The two weapon arms are the exception:
+they carry `[` and `]`, the keys an FPS has cycled weapons on since Quake, and they are this HUD's own rather
+than DOOM's, because DOOM has no previous-or-next weapon key to name. Every key here is registered on the
+same action as the button it sits under, so a button lights up for its key as well as for its pad button.
+
+Changing weapon is the one control with logic behind it. Pressing a number DOOM has no weapon for does
+nothing, so the HUD asks the engine what is in hand, walks to the next slot `is_weapon_owned` agrees with,
+and presses that slot's number - a real key event, the same one a player typing 4 would make, held for 80 ms
+because DOOM reads its input once per tic. It is marked `DEVICE_ID_EMULATION` so the HUD does not mistake its
+own keystroke for someone reaching for the keyboard and take a pad player's artwork away. Set the HUD's
+`game` to the `PureDoom` node to turn it on; left unset, the arms do nothing.
 
 Slots DOOM does nothing with - the shoulders, the triggers - are left blank, and the addon hides a blank
 slot. Back is left blank too even though the engine reads it, because the d-pad's down arm already opens

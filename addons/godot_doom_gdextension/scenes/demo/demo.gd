@@ -32,6 +32,8 @@ func _ready() -> void:
 	engine.set(&"wad_path", WAD)
 	engine.connect(&"exited", _on_engine_exited)
 	screen.add_child(engine)
+	# The HUD's weapon arms ask the engine what is in hand and what is owned, so they need to know it.
+	controls.game = engine
 	_start_music()
 	uses_mouse = not DisplayServer.is_touchscreen_available()
 	# A touch arrives as an emulated mouse click too, and DOOM fires on mouse left, so without this every tap

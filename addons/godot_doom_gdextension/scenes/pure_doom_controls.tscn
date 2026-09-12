@@ -15,10 +15,10 @@
 [ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tab.svg" id="13_tab_pressed"]
 [ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tilde_outline.svg" id="14_tilde_normal"]
 [ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tilde.svg" id="15_tilde_pressed"]
-[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_1_outline.svg" id="16_one_normal"]
-[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_1.svg" id="17_one_pressed"]
-[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_7_outline.svg" id="18_seven_normal"]
-[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_7.svg" id="19_seven_pressed"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_bracket_open_outline.svg" id="16_prev_normal"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_bracket_open.svg" id="17_prev_pressed"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_bracket_close_outline.svg" id="18_next_normal"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_bracket_close.svg" id="19_next_pressed"]
 
 [node name="PureDoomControls" instance=ExtResource("1_controls")]
 script = ExtResource("2_script")
@@ -43,8 +43,9 @@ action_look_down = &"doom_look_down"
 action_look_left = &"doom_look_left"
 action_look_right = &"doom_look_right"
 ; The keyboard art is exported so a project that binds different keys than the addon's defaults shows
-; its own. These are the keys PureDoom itself answers to; the sticks keep the addon's W/A/S/D and
-; arrows, and Start keeps its Escape, because those are already what DOOM wants.
+; its own. These are the keys PureDoom itself answers to, bar the brackets on the weapon arms, which
+; are this HUD's own because DOOM has no previous-or-next weapon key. The sticks keep the addon's
+; W/A/S/D and arrows, and Start keeps its Escape, because those are already what DOOM wants.
 keyboard_mouse_button_0_normal = ExtResource("4_space_normal")
 keyboard_mouse_button_0_pressed = ExtResource("5_space_pressed")
 keyboard_mouse_button_1_normal = ExtResource("6_enter_normal")
@@ -57,10 +58,10 @@ keyboard_mouse_button_11_normal = ExtResource("12_tab_normal")
 keyboard_mouse_button_11_pressed = ExtResource("13_tab_pressed")
 keyboard_mouse_button_12_normal = ExtResource("14_tilde_normal")
 keyboard_mouse_button_12_pressed = ExtResource("15_tilde_pressed")
-keyboard_mouse_button_13_normal = ExtResource("16_one_normal")
-keyboard_mouse_button_13_pressed = ExtResource("17_one_pressed")
-keyboard_mouse_button_14_normal = ExtResource("18_seven_normal")
-keyboard_mouse_button_14_pressed = ExtResource("19_seven_pressed")
+keyboard_mouse_button_13_normal = ExtResource("16_prev_normal")
+keyboard_mouse_button_13_pressed = ExtResource("17_prev_pressed")
+keyboard_mouse_button_14_normal = ExtResource("18_next_normal")
+keyboard_mouse_button_14_pressed = ExtResource("19_next_pressed")
 
 [node name="Label" parent="BottomLeft/JoypadButton11" index="0"]
 text = "Automap"
@@ -69,10 +70,10 @@ text = "Automap"
 text = "Menu"
 
 [node name="Label" parent="BottomLeft/JoypadButton13" index="0"]
-text = "Weapons"
+text = "Weapon"
 
 [node name="Label" parent="BottomLeft/JoypadButton14" index="0"]
-text = "Weapons"
+text = "Weapon"
 
 [node name="Label" parent="BottomLeft/LeftJoystick" index="0"]
 text = "Move"
@@ -87,10 +88,10 @@ text = "Automap"
 text = "Menu"
 
 [node name="Label" parent="BottomLeft/KeyJ" index="0"]
-text = "Weapons"
+text = "Weapon"
 
 [node name="Label" parent="BottomLeft/KeyL" index="0"]
-text = "Weapons"
+text = "Weapon"
 
 [node name="Label" parent="BottomRight/JoypadButton0" index="0"]
 text = "Use"

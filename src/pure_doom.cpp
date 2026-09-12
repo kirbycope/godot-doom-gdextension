@@ -226,7 +226,7 @@ int doom_key_from(Key key) {
 }
 
 // Pad buttons: A uses, X fires, B accepts, Y runs, Back opens the menu, and the d-pad is the arrows (which is
-// what the menu wants; in the game _input gives the d-pad the automap, the menu and weapon cycling instead).
+// what the menu wants; in the game _input gives the d-pad the automap and the menu instead).
 int doom_key_from_joy_button(JoyButton button) {
 	switch (button) {
 		case JOY_BUTTON_A: return DOOM_KEY_SPACE;
@@ -251,6 +251,7 @@ void PureDoom::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_menu_open"), &PureDoom::is_menu_open);
 	ClassDB::bind_method(D_METHOD("is_automap_open"), &PureDoom::is_automap_open);
 	ClassDB::bind_method(D_METHOD("get_weapon_slot"), &PureDoom::get_weapon_slot);
+	ClassDB::bind_method(D_METHOD("is_weapon_owned", "slot"), &PureDoom::is_weapon_owned);
 	ClassDB::bind_method(D_METHOD("get_frame"), &PureDoom::get_frame);
 
 	ClassDB::bind_method(D_METHOD("set_wad_path", "path"), &PureDoom::set_wad_path);
@@ -368,10 +369,6 @@ void PureDoom::stop() {
 		handle_key(DOOM_KEY_CTRL, false);
 		trigger_fire = false;
 	}
-	if (pending_weapon_key != 0) {
-		doom_key_up(doom_key_t(pending_weapon_key));
-		pending_weapon_key = 0;
-	}
 	if (sound_player) {
 		sound_player->stop();
 	}
@@ -401,23 +398,13 @@ int PureDoom::get_weapon_slot() const {
 	return weapon == 7 ? 1 : weapon + 1;
 }
 
-// Presses the number of the next owned weapon slot in [param direction] and lets go a couple of tics later,
-// long enough for the engine to see it.
-void PureDoom::cycle_weapon(int direction) {
-	if (pending_weapon_key != 0 || !engine_initialized) {
-		return;
+// Whether the player is carrying the weapon in [param slot], numbered as get_weapon_slot numbers them.
+// Slot 1 is the fist, which is never dropped. A host cycling weapons uses this to skip the empty slots.
+bool PureDoom::is_weapon_owned(int slot) const {
+	if (!engine_initialized || slot < 1 || slot > 7) {
+		return false;
 	}
-	int slot = get_weapon_slot();
-	for (int step = 0; step < 7; step++) {
-		slot = ((slot - 1 + direction + 7) % 7) + 1;
-		bool owned = slot == 1 || pure_doom_weapon_owned(slot - 1) != 0;
-		if (owned) {
-			pending_weapon_key = DOOM_KEY_1 + slot - 1;
-			weapon_release_in = 0.08;
-			doom_key_down(doom_key_t(pending_weapon_key));
-			return;
-		}
-	}
+	return slot == 1 || pure_doom_weapon_owned(slot - 1) != 0;
 }
 
 // The last 320x200 frame as an Image, updated on the CPU every tick whatever the renderer.
@@ -434,13 +421,6 @@ void PureDoom::_process(double delta) {
 		return;
 	}
 	clock_usec += delta * 1000000.0;
-	if (pending_weapon_key != 0) {
-		weapon_release_in -= delta;
-		if (weapon_release_in <= 0.0) {
-			doom_key_up(doom_key_t(pending_weapon_key));
-			pending_weapon_key = 0;
-		}
-	}
 	doom_update();
 	if (exit_requested) {
 		exit_requested = false;
@@ -606,13 +586,16 @@ void PureDoom::_input(const Ref<InputEvent> &event) {
 	if (joy_button.is_valid()) {
 		JoyButton button = joy_button->get_button_index();
 		bool pressed = joy_button->is_pressed();
-		// With the menu up the d-pad is its arrow keys; in the game it is the automap, the menu and the weapons
+		// With the menu up the d-pad is its arrow keys; in the game up is the automap and down is the menu.
+		// Left and right do nothing here on purpose: DOOM has no previous-or-next weapon key to press, so
+		// cycling is the host's, which walks the slots with is_weapon_owned and presses the number itself.
+		// Turning them into arrows instead would spin the player round every time they changed weapon.
 		if (!pure_doom_menu_active()) {
 			switch (button) {
 				case JOY_BUTTON_DPAD_UP: handle_key(DOOM_KEY_TAB, pressed); return;
 				case JOY_BUTTON_DPAD_DOWN: handle_key(DOOM_KEY_ESCAPE, pressed); return;
-				case JOY_BUTTON_DPAD_LEFT: if (pressed) { cycle_weapon(-1); } return;
-				case JOY_BUTTON_DPAD_RIGHT: if (pressed) { cycle_weapon(1); } return;
+				case JOY_BUTTON_DPAD_LEFT:
+				case JOY_BUTTON_DPAD_RIGHT: return;
 				default: break;
 			}
 		}
