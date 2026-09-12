@@ -1,6 +1,6 @@
 extends GutTest
 
-## Purpose: The demo scene boots the engine full screen with the controls card and the on-screen pad, wires
+## Purpose: The demo scene boots the engine full screen with the controls HUD around it, wires
 ## the music up when Godot MIDI Player is present, and says so instead of failing where the library is not
 ## built.
 
@@ -18,7 +18,7 @@ func after_each() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE # The demo captures it; leave the rest of the suite alone
 
 
-func test_engine_fills_the_screen_and_the_card_shows() -> void:
+func test_engine_fills_the_screen_and_the_hud_shows() -> void:
 	if not ClassDB.class_exists(&"PureDoom"):
 		assert_true(demo.missing.visible, "Without the library the demo should say so")
 		assert_null(demo.engine)
@@ -28,26 +28,21 @@ func test_engine_fills_the_screen_and_the_card_shows() -> void:
 	assert_eq(demo.engine.get_parent(), demo.screen, "It belongs in the aspect ratio container")
 	assert_true(demo.engine.call(&"is_running"), "The demo boots straight into E1M1")
 	assert_false(demo.missing.visible)
-	assert_true(demo.overlay.visible, "The controls card shows beside the screen")
-	assert_true("Fire" in demo.overlay.actions.text)
+	assert_true(demo.controls.visible, "The controls HUD shows around the screen")
+	assert_eq(demo.controls.joypad_button_2_label.text, "Fire", "with each button named after what it does")
 
 
-## On a phone the pad has the screen edges and the card would only be in its way, so they swap and the monitor
-## pulls in to leave the thumb clusters clear.
-func test_the_card_gives_way_to_the_pad_on_touch() -> void:
+## The HUD is the same HUD on every device: the words never move, only the art on the buttons does. That is
+## what replaced the plain-text card the demo used to print down each side for a keyboard and a pad.
+func test_the_hud_keeps_its_words_when_the_device_changes() -> void:
 	if not ClassDB.class_exists(&"PureDoom"):
 		pass_test("PureDoom is not built for this platform")
 		return
-	demo._on_device_changed("touch")
-	assert_false(demo.overlay.visible, "The card steps aside")
-	assert_eq(demo.screen.offset_left, PureDoomDemo.PAD_INSET_SIDE, "and the monitor pulls in for the pad")
-	assert_eq(demo.screen.offset_bottom, -PureDoomDemo.PAD_INSET_BOTTOM)
-
-	demo._on_device_changed("xbox")
-	assert_true(demo.overlay.visible, "A pad in hand gets the card back")
-	assert_eq(demo.overlay.input_type, "xbox", "worded for what is in it")
-	assert_eq(demo.screen.offset_left, PureDoomDemo.CARD_INSET, "and the monitor goes back to full height")
-	assert_eq(demo.screen.offset_bottom, 0.0)
+	var touch_art: Texture2D = demo.controls.joypad_button_2.texture_normal
+	demo.controls.current_input_type = Controls.InputType.KEYBOARD_MOUSE
+	assert_eq(demo.controls.joypad_button_2_label.text, "Fire", "Fire is Fire whatever is in hand")
+	assert_true(demo.controls.visible, "and the HUD stays up rather than giving way to a card")
+	assert_ne(demo.controls.joypad_button_2.texture_normal, touch_art, "only the art changes")
 
 
 ## DOOM fires on mouse left and every touch arrives as an emulated mouse click, so a tap on the pad, or
@@ -98,7 +93,7 @@ func test_the_engine_quitting_stops_the_music_and_reports_the_code() -> void:
 	assert_true(demo.missing.visible)
 	assert_true("code 0" in demo.missing.text, "The exit code should be reported on screen")
 	assert_false(demo.engine.visible)
-	assert_false(demo.overlay.visible)
+	assert_false(demo.controls.visible)
 	assert_false(demo.mouse_captured, "Quitting DOOM should give the cursor back")
 	_assert_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 

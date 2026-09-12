@@ -1,20 +1,14 @@
 class_name PureDoomDemo
 extends Control
-## Runs the PureDoom GDExtension full screen with the controls card down each side, the on-screen pad for a
-## player with no keyboard, and, when Godot MIDI Player is in the project, DOOM's music through the bundled
-## SoundFont. Where the library is not built for the platform the screen says so instead.
+## Runs the PureDoom GDExtension full screen with the controls HUD around it and, when Godot MIDI Player is
+## in the project, DOOM's music through the bundled SoundFont. Where the library is not built for the
+## platform the screen says so instead.
 
 const MIDI_PLAYER_SCENE: String = "res://addons/midi/MidiPlayer.tscn" ## Optional: no music without it.
 const SOUNDFONT: String = "res://addons/godot_doom_gdextension/assets/gzdoom.sf2"
 ## The node defaults to this path too, but the libraries in bin/ were built when the addon lived at
 ## addons/pure_doom, so they still bake in the old one. Setting it here works on every platform.
 const WAD: String = "res://addons/godot_doom_gdextension/assets/doom1.wad"
-const CARD_INSET: float = 170.0 ## Room down each side of the monitor for the controls card.
-## Room for the on-screen pad: the thumb clusters in the bottom corners, the shoulder row across the top and
-## the face buttons down the right all reach further in than the card does.
-const PAD_INSET_SIDE: float = 190.0
-const PAD_INSET_TOP: float = 130.0
-const PAD_INSET_BOTTOM: float = 160.0
 
 var engine: Control ## The PureDoom node, null where the library is missing.
 var midi_player: Node ## Synthesises the engine's music, null without Godot MIDI Player.
@@ -25,8 +19,7 @@ var uses_mouse: bool = true
 
 @onready var screen: Container = $Screen
 @onready var missing: Label = $Missing
-@onready var overlay: PureDoomControlsOverlay = $PureDoomControlsOverlay
-@onready var virtual_pad: PureDoomVirtualPad = $VirtualPad
+@onready var controls: PureDoomControls = $Controls
 @onready var click_to_start: CanvasLayer = $ClickToStart
 
 
@@ -45,26 +38,12 @@ func _ready() -> void:
 	# anywhere on screen shoots - including the one that pushes the stick. The engine wants a real mouse's
 	# relative motion; it has no use for a phone's invented one.
 	Input.emulate_mouse_from_touch = false
-	virtual_pad.device_changed.connect(_on_device_changed)
-	_on_device_changed(virtual_pad.card_input_type())
 	# The browser only grants pointer lock from inside a user gesture, so on web the interstitial waits for
 	# a click and captures then. Everywhere else the capture takes hold straight away.
 	click_to_start.visible = OS.has_feature("web")
 	if uses_mouse:
 		capture_mouse()
 	engine.call(&"start")
-
-
-## The card beside the monitor words itself for the device in hand. On a phone it steps aside for the pad,
-## whose buttons say what they do themselves, and the monitor pulls in to leave the thumb clusters clear.
-func _on_device_changed(card_input_type: String) -> void:
-	overlay.input_type = card_input_type
-	var touch: bool = card_input_type == "touch"
-	overlay.visible = not touch
-	screen.offset_left = PAD_INSET_SIDE if touch else CARD_INSET
-	screen.offset_right = -screen.offset_left
-	screen.offset_top = PAD_INSET_TOP if touch else 0.0
-	screen.offset_bottom = -PAD_INSET_BOTTOM if touch else 0.0
 
 
 ## Wires DOOM's 140 Hz MIDI stream into Godot MIDI Player when that addon is present.
@@ -96,7 +75,8 @@ func capture_mouse() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
-## Escape gives the cursor back rather than trapping it; DOOM's own menu is on backquote.
+## Gives the cursor back rather than trapping it. DOOM's own menu is on backquote, so leaving the demo and
+## opening the game's menu are two different buttons.
 func release_mouse() -> void:
 	mouse_captured = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -112,7 +92,9 @@ func _input(event: InputEvent) -> void:
 			if uses_mouse:
 				capture_mouse()
 		return
-	if event.is_action_pressed(&"ui_cancel"):
+	# Leaving is an action rather than a key, because the HUD draws it on Start as well as on Escape and it
+	# is the HUD that decides which key that is.
+	if event.is_action_pressed(&"doom_leave"):
 		release_mouse()
 	elif pressed and uses_mouse and not mouse_captured:
 		capture_mouse()
@@ -126,5 +108,5 @@ func _on_engine_exited(code: int) -> void:
 		engine.hide()
 	missing.text = "DOOM exited with code %d." % code
 	missing.show()
-	overlay.hide()
+	controls.hide()
 	release_mouse()

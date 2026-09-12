@@ -1,0 +1,114 @@
+[gd_scene load_steps=20 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/controls/controls.tscn" id="1_controls"]
+[ext_resource type="Script" path="res://addons/godot_doom_gdextension/scripts/pure_doom_controls.gd" id="2_script"]
+[ext_resource type="Resource" path="res://addons/godot_doom_gdextension/resources/pure_doom_inputs.tres" id="3_catalog"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_space_outline.svg" id="4_space_normal"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_space.svg" id="5_space_pressed"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_enter_outline.svg" id="6_enter_normal"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_enter.svg" id="7_enter_pressed"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_ctrl_outline.svg" id="8_ctrl_normal"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_ctrl.svg" id="9_ctrl_pressed"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_shift_outline.svg" id="10_shift_normal"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_shift.svg" id="11_shift_pressed"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tab_outline.svg" id="12_tab_normal"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tab.svg" id="13_tab_pressed"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tilde_outline.svg" id="14_tilde_normal"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_tilde.svg" id="15_tilde_pressed"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_1_outline.svg" id="16_one_normal"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_1.svg" id="17_one_pressed"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_7_outline.svg" id="18_seven_normal"]
+[ext_resource type="Texture2D" path="res://addons/controls/assets/kenney_nl/Icons/Input Prompts/Keyboard & Mouse/Vector/keyboard_7.svg" id="19_seven_pressed"]
+
+[node name="PureDoomControls" instance=ExtResource("1_controls")]
+script = ExtResource("2_script")
+input_catalog = ExtResource("3_catalog")
+action_button_0 = &"doom_use"
+action_button_1 = &"doom_confirm"
+action_button_2 = &"doom_fire"
+action_button_3 = &"doom_run"
+; The Back button is left blank on purpose: the d-pad's down arm already opens DOOM's menu, and one
+; menu button is enough. Start is the host's, not the engine's - it gives the cursor back.
+action_button_6 = &"doom_leave"
+action_button_11 = &"doom_dpad_up"
+action_button_12 = &"doom_dpad_down"
+action_button_13 = &"doom_dpad_left"
+action_button_14 = &"doom_dpad_right"
+action_move_up = &"doom_move_up"
+action_move_down = &"doom_move_down"
+action_move_left = &"doom_move_left"
+action_move_right = &"doom_move_right"
+action_look_up = &"doom_look_up"
+action_look_down = &"doom_look_down"
+action_look_left = &"doom_look_left"
+action_look_right = &"doom_look_right"
+; The keyboard art is exported so a project that binds different keys than the addon's defaults shows
+; its own. These are the keys PureDoom itself answers to; the sticks keep the addon's W/A/S/D and
+; arrows, and Start keeps its Escape, because those are already what DOOM wants.
+keyboard_mouse_button_0_normal = ExtResource("4_space_normal")
+keyboard_mouse_button_0_pressed = ExtResource("5_space_pressed")
+keyboard_mouse_button_1_normal = ExtResource("6_enter_normal")
+keyboard_mouse_button_1_pressed = ExtResource("7_enter_pressed")
+keyboard_mouse_button_2_normal = ExtResource("8_ctrl_normal")
+keyboard_mouse_button_2_pressed = ExtResource("9_ctrl_pressed")
+keyboard_mouse_button_3_normal = ExtResource("10_shift_normal")
+keyboard_mouse_button_3_pressed = ExtResource("11_shift_pressed")
+keyboard_mouse_button_11_normal = ExtResource("12_tab_normal")
+keyboard_mouse_button_11_pressed = ExtResource("13_tab_pressed")
+keyboard_mouse_button_12_normal = ExtResource("14_tilde_normal")
+keyboard_mouse_button_12_pressed = ExtResource("15_tilde_pressed")
+keyboard_mouse_button_13_normal = ExtResource("16_one_normal")
+keyboard_mouse_button_13_pressed = ExtResource("17_one_pressed")
+keyboard_mouse_button_14_normal = ExtResource("18_seven_normal")
+keyboard_mouse_button_14_pressed = ExtResource("19_seven_pressed")
+
+[node name="Label" parent="BottomLeft/JoypadButton11" index="0"]
+text = "Automap"
+
+[node name="Label" parent="BottomLeft/JoypadButton12" index="0"]
+text = "Menu"
+
+[node name="Label" parent="BottomLeft/JoypadButton13" index="0"]
+text = "Weapons"
+
+[node name="Label" parent="BottomLeft/JoypadButton14" index="0"]
+text = "Weapons"
+
+[node name="Label" parent="BottomLeft/LeftJoystick" index="0"]
+text = "Move"
+
+[node name="Label" parent="BottomLeft/KeyW" index="0"]
+text = "Move"
+
+[node name="Label" parent="BottomLeft/KeyI" index="0"]
+text = "Automap"
+
+[node name="Label" parent="BottomLeft/KeyK" index="0"]
+text = "Menu"
+
+[node name="Label" parent="BottomLeft/KeyJ" index="0"]
+text = "Weapons"
+
+[node name="Label" parent="BottomLeft/KeyL" index="0"]
+text = "Weapons"
+
+[node name="Label" parent="BottomRight/JoypadButton0" index="0"]
+text = "Use"
+
+[node name="Label" parent="BottomRight/JoypadButton1" index="0"]
+text = "Pick"
+
+[node name="Label" parent="BottomRight/JoypadButton2" index="0"]
+text = "Fire"
+
+[node name="Label" parent="BottomRight/JoypadButton3" index="0"]
+text = "Run"
+
+[node name="Label" parent="BottomRight/RightJoystick" index="0"]
+text = "Turn"
+
+[node name="Label" parent="BottomRight/KeyUp" index="0"]
+text = "Turn"
+
+[node name="Label" parent="TopCenter/JoypadButton6" index="0"]
+text = "Leave"

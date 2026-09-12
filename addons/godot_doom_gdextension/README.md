@@ -11,8 +11,8 @@ builds for the Windows desktop and for the browser as a WebAssembly side module.
 
 ## Demo scene
 
-`scenes/demo/demo.tscn` runs the node full screen with the controls card down each side, an on-screen pad for
-a player with no keyboard, and, when Godot MIDI Player (`addons/midi/`) is in the project, the music through
+`scenes/demo/demo.tscn` runs the node full screen with the controls HUD around it and, when Godot MIDI
+Player (`addons/midi/`) is in the project, the music through
 `assets/gzdoom.sf2`. It is the main scene of the
 [Godot Doom GDExtension](https://github.com/kirbycope/godot-doom-gdextension) project this addon is developed
 in, and it is also the shortest example of wiring the node up: instantiate it, connect `exited`, connect
@@ -94,47 +94,44 @@ stick turns (it presses DOOM's left and right arrows, so Y for run applies), RT 
 B accepts, Back opens the menu, and the d-pad is context-sensitive: with the menu up it is the arrow keys,
 in the game up is the automap, down is the menu, and left and right cycle to the previous or next weapon you
 own (`cycle_weapon` reads the engine's weapon list, presses the slot's number and lets go two tics later).
-On a touchscreen the demo's on-screen pad drives that same pad mapping, so the browser demo plays on a phone.
+On a touchscreen the HUD's own buttons drive that same pad mapping, so the browser demo plays on a phone.
 `is_menu_open()`, `is_automap_open()` and `get_weapon_slot()` expose the same engine state. The level starts directly (`-warp 1 1`)
 because Escape and Start are left to the host scene; after dying, use restarts the level.
 
-## On-screen pad
+## The controls HUD
 
-`scripts/pure_doom_virtual_pad.gd` is what makes the browser demo playable on a phone. It is a plain `Node`
-that looks for [godot-controls](https://github.com/kirbycope/godot-controls) at `res://addons/controls/`,
-and where that addon is installed it instances the HUD, puts a `doom_*` action on every slot DOOM has a use
-for, names each button after what the engine does with it, and turns the taps back into the joypad events
-`pure_doom.cpp` already reads. The engine's pad mapping is the whole implementation: a virtual pad needs no
-new engine code, only a translation from the addon's actions to the buttons and axes that mapping expects.
+`scenes/pure_doom_controls.tscn` is the on-screen mapping: the
+[controls](https://github.com/kirbycope/godot-controls) addon's `controls.tscn` inherited, with a `doom_*`
+action on every slot DOOM has a use for and each button named after what the engine does with it. The scene
+is the mapping rather than a picture of one, so the actions and the words are inspector fields and can be
+read by opening it. `resources/pure_doom_inputs.tres` lists the actions the engine publishes, which turns
+each slot into a picker of them instead of free text.
 
-Slots DOOM does nothing with - the shoulders, the triggers, Start - are left blank, and the addon hides a
-blank slot. Back is left blank too even though the engine reads it, because the d-pad's down arm already
-opens DOOM's menu and one menu button is enough. The share button is left to the addon, which puts its own
-screenshot on it. The vertical half of the right stick is filled even though the engine ignores it, because
-the addon hides a stick whose vertical pair is blank and turning is what that stick is for.
+The labels say what a button does and never change with the device; only the art on it does. So Fire is Fire
+on X, on Square and on Ctrl, which is why the demo no longer prints a separate text card for a keyboard and
+a pad. The keyboard art names the keys `pure_doom.cpp` itself answers to: Space uses, Enter picks, Ctrl
+fires, Shift runs, Tab is the automap, backquote opens DOOM's menu, and the d-pad's weapon arms carry 1 and
+7, the ends of the number row that picks weapons on a keyboard. Those keys are registered on the same
+actions, so a button lights up for its key as well as for its pad button.
 
-Buttons and sticks are read differently on purpose. A `TouchScreenButton` sends an `InputEventAction`, so the
-buttons are listened for in `_input`, and nothing else in Godot sends one - a real key or pad reaches
-`PureDoom` on its own and must not arrive twice. Godot's `VirtualJoystick` presses its actions straight into
-the input state without sending an event, so the sticks are read in `_process` instead, and only while the pad
-is on screen.
+Slots DOOM does nothing with - the shoulders, the triggers - are left blank, and the addon hides a blank
+slot. Back is left blank too even though the engine reads it, because the d-pad's down arm already opens
+DOOM's menu and one menu button is enough. Start is the host's rather than the engine's: it is `doom_leave`,
+which gives the cursor back. The share button is left to the addon, which puts its own screenshot on it. The
+vertical half of the right stick is filled even though the engine ignores it, because the addon hides a
+stick whose vertical pair is blank and turning is what that stick is for.
 
-The pad is up for touch alone. A keyboard or a real controller has buttons of its own and gets the controls
-card instead, which words itself for whichever of them is in hand; the two never share the screen, and the
-monitor pulls in to leave the thumb clusters clear whenever the pad is up. The addon is optional the same way
-Godot MIDI Player is: without it the node does nothing and the demo runs exactly as it did.
+`scripts/pure_doom_controls.gd` holds only the two things the addon leaves to a game. The keys above, and
+turning a tap back into the joypad event `pure_doom.cpp` already reads - the engine's pad mapping is the
+whole implementation, so a virtual pad needs no new engine code. Buttons and sticks are read differently on
+purpose: a `TouchScreenButton` sends an `InputEventAction`, so the buttons are listened for in `_input`, and
+nothing else in Godot sends one. Godot's `VirtualJoystick` presses its actions straight into the input state
+without sending an event, so the sticks are read in `_process` instead, and only on a touchscreen - a key or
+a real pad reaches `PureDoom` on its own, and the keys above are bound to those same actions, so counting
+them would hand DOOM a W it already had.
 
-## Controls card
-
-`scenes/pure_doom_controls_overlay.tscn` is a `CanvasLayer` that prints the controls in plain text down each
-side of the screen, a movement column on the left and an actions column on the right, so a scene that fills
-the middle with the monitor has the black bands documented. What it prints comes from
-`resources/controls.tres`, a `PureDoomControls` resource: two lists of `PureDoomControl` lines, each with the
-DOOM action's name and the input for it written out for `keyboard`, `xbox`, `nintendo` and `playstation`.
-Set the overlay's `input_type` to one of those (or `touch`, which shows the Xbox wording) from whatever
-detects the device, and lines with no text for that device are dropped, so the weapon slots and the strafe
-modifier only appear on the keyboard. The card describes the mapping in `pure_doom.cpp`; editing the `.tres`
-changes the wording, not the mapping.
+The addon is a dependency rather than an option: `tools/addons.json` names it and `python tools/pull_addons.py`
+fetches it, which is what the CI workflows run before anything else.
 
 Config and save files go to `user://pure_doom/`. PureDOOM keeps one global engine, so only one `PureDoom`
 node can run in a process and it initialises once; `stop()` and `start()` pause and resume it.

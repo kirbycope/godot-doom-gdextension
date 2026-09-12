@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ControlsInputCatalog" format=3]
+
+[ext_resource type="Script" path="res://addons/controls/input_catalog.gd" id="1_catalog"]
+
+[resource]
+script = ExtResource("1_catalog")
+actions = Array[StringName]([&"doom_fire", &"doom_use", &"doom_confirm", &"doom_run", &"doom_dpad_up", &"doom_dpad_down", &"doom_dpad_left", &"doom_dpad_right", &"doom_move_up", &"doom_move_down", &"doom_move_left", &"doom_move_right", &"doom_look_up", &"doom_look_down", &"doom_look_left", &"doom_look_right", &"doom_leave"])
