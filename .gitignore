@@ -6,6 +6,9 @@ test-results/
 .mcp/
 extension_api.json
 
+# Cloned to build the GDExtension, never committed; the README says where to get it.
+godot-cpp/
+
 # The GDExtension's own build output is ignored by addons/godot_doom_gdextension/.gitignore, which
 # travels with the addon so it works the same wherever the addon is dropped.
 
