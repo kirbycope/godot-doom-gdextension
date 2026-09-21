@@ -85,6 +85,23 @@ var _pressing: int = 0 ## The number key being held down for a weapon change, or
 var _release_in: float = 0.0 ## Seconds left to hold it.
 
 
+## Leaving the tree lets go of everything this node pressed into the input state on the engine's behalf: a
+## stick it drove is centred and a weapon number it was holding is released. Otherwise the last axis value it
+## sent stands in Godot's joypad state after the HUD is gone, and whatever reads that pad next, a Player in the
+## scene this hands over to, walks off on its own.
+func _exit_tree() -> void:
+	for axis: int in _sent:
+		if not is_zero_approx(_sent[axis]):
+			var motion_event: InputEventJoypadMotion = InputEventJoypadMotion.new()
+			motion_event.axis = axis
+			motion_event.axis_value = 0.0
+			Input.parse_input_event(motion_event)
+	_sent.clear()
+	if _pressing != 0:
+		_press_weapon_key(_pressing, false)
+		_pressing = 0
+
+
 func _ready() -> void:
 	# The addon registers extra_actions before it fills in the gaps itself, and a subclass sets them here
 	# rather than from a parent, because a child is ready before whatever owns it.

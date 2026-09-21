@@ -149,6 +149,27 @@ func test_cycling_does_nothing_with_only_one_weapon() -> void:
 	assert_eq(controls.next_weapon_slot(-1), 0)
 
 
+## A stick this HUD drove is centred again when the HUD goes, or the last value it sent would stand in
+## Godot's joypad state after it, and whatever reads that pad next, the Player in the scene this hands over
+## to, would walk off on its own.
+func test_leaving_the_tree_lets_go_of_the_stick() -> void:
+	controls.current_input_type = Controls.InputType.TOUCH
+	Input.action_press(&"doom_move_up", 1.0)
+	controls._process(0.016)
+	assert_almost_eq(controls._sent.get(JOY_AXIS_LEFT_Y, 0.0), -1.0, 0.01, "The thumb on the stick was sent")
+	Input.action_release(&"doom_move_up")
+	var centred: Array = []
+	var watcher: Callable = func(event: InputEvent) -> void:
+		if event is InputEventJoypadMotion and (event as InputEventJoypadMotion).axis == JOY_AXIS_LEFT_Y:
+			centred.append((event as InputEventJoypadMotion).axis_value)
+	get_viewport().set_input_as_handled()
+	remove_child(controls)
+	assert_true(controls._sent.is_empty(), "Nothing is left as sent")
+	controls.queue_free()
+	await wait_process_frames(1)
+	assert_true(is_zero_approx(Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)), "The pad's stick reads centred once the HUD is gone")
+
+
 ## Stands in for the engine, which cannot be asked to drop a weapon on demand.
 class FakeDoom:
 	extends Node

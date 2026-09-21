@@ -76,6 +76,17 @@ func test_changing_level_keeps_the_engine_alive() -> void:
 			if image.get_pixel(x, y).get_luminance() > 0.05:
 				lit += 1
 	assert_gt(lit, 0, "The new level should be drawing")
+	# The engine is one per process, so the level stays changed for every PureDoom node after this one: put it
+	# back on E1M1, where a fresh node expects to find it, with its music playing.
+	for character in "idclev11":
+		for pressed in [true, false]:
+			var key = InputEventKey.new()
+			key.keycode = OS.find_keycode_from_string(character)
+			key.pressed = pressed
+			Input.parse_input_event(key)
+			await wait_process_frames(1)
+	await wait_seconds(1.0)
+	assert_true(doom.call(&"is_running"), "and the engine is still running back on E1M1")
 
 
 func test_pad_back_toggles_the_menu_and_the_weapon_arms_are_the_hosts() -> void:
