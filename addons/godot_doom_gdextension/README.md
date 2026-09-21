@@ -174,12 +174,4 @@ Emscripten SDK on `PATH` (`emsdk_env`), and the Web export preset needs Extensio
 Support off to match the `threads=no` library. Godot's `godot-cpp` `master` branch is used because the
 project runs a 4.8 development build.
 
-## Credits and licenses
-
-| What | Author | License | Source |
-| --- | --- | --- | --- |
-| `addons/controls` | Tim Cope | MIT | https://github.com/kirbycope/godot-controls |
-| `thirdparty/PureDOOM.h` | Daivuk (David St-Louis), from the id Software DOOM source | GPL 2.0 (`thirdparty/LICENSE`) | https://github.com/Daivuk/PureDOOM |
-| `assets/doom1.wad` | id Software | DOOM shareware, freely redistributable | https://github.com/Daivuk/PureDOOM |
-| `assets/gzdoom.sf2` (GZDoom's default General MIDI SoundFont, an SC-55 preset) | ZDoom team | not recorded - fill in (ships with GZDoom, no license file of its own) | https://github.com/ZDoom/gzdoom/blob/master/soundfont/gzdoom.sf2 |
-| `src/` | this project | MIT | |
+Third-party assets are credited in [CREDITS.md](CREDITS.md).
