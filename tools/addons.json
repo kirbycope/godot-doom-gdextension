@@ -1,10 +1,22 @@
 {
-  "_comment": "Dependencies of this repository's demo project, fetched into addons/ by tools/pull_addons.py. They are git-ignored: run the script after cloning.",
+  "_comment": "Addons fetched into addons/ by tools/pull_addons.py and git-ignored: run the script after cloning. 'ref' is the branch, tag or commit to take; 'main' means always the latest. A 'third_party' addon is somebody else's work, pinned to a release and never pushed to. tools/addons.lock.json records what was actually taken.",
   "addons": [
     {
       "name": "controls",
       "repo": "https://github.com/kirbycope/godot-controls.git",
       "ref": "main"
+    },
+    {
+      "name": "gut",
+      "repo": "https://github.com/bitwes/Gut.git",
+      "ref": "v9.7.1",
+      "third_party": true
+    },
+    {
+      "name": "midi",
+      "repo": "https://bitbucket.org/arlez80/godot-midi-player-g4.git",
+      "ref": "252157b64e9a94686b363b3cce53f195cb828aa2",
+      "third_party": true
     }
   ]
 }

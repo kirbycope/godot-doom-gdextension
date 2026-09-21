@@ -20,6 +20,11 @@ addons/midi/                    the SoundFont synthesiser for the music
 addons/gut/                     the test runner
 ```
 
+`addons/gut/` is not committed, and neither is any other addon the manifest in `tools/addons.json` names:
+`python tools/pull_addons.py` fetches them after cloning, pinned to the commits in `tools/addons.lock.json`,
+and CI runs the same pull before the tests. GUT is a third-party entry, taken from its release tag and never
+pushed to.
+
 Clone it, open `project.godot` in Godot, and run the demo scene. The addon is mounted at
 `res://addons/godot_doom_gdextension/` exactly as it is in a game, so it is edited in place with nothing copied
 anywhere first. Installing through the Asset Library takes `addons/` and skips the root

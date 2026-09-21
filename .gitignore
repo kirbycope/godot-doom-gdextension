@@ -15,6 +15,8 @@ godot-cpp/
 # Fetched by tools/pull_addons.py, never committed here.
 .addon_cache/
 addons/controls/
+addons/gut/
+addons/midi/
 
 # The web export. Tens of megabytes, and git cannot delta a .wasm; CI builds it for Pages.
 build/
